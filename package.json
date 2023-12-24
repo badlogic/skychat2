@@ -1,13 +1,13 @@
 {
-  "name": "__app_name__",
+  "name": "skychat2",
   "version": "1.0.0",
   "app": {
-    "name": "app",
-    "description": "A super duper app",
-    "host": "marioslab.io",
+    "name": "skychat2",
+    "description": "A pretty good BlueSky app for desktop, mobile, and web",
+    "host": "slayer.marioslab.io",
     "hostDir": "/home/badlogic",
     "serverPort": 3333,
-    "domain": "app.io",
+    "domain": "skychat.marioslab.io",
     "email": "badlogicgames@gmail.com"
   },
   "scripts": {

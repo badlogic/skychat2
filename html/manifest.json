@@ -1,7 +1,7 @@
 {
-    "name": "__app_name__",
-    "short_name": "__app_name__",
-    "description": "__app_description__",
+    "name": "skychat2",
+    "short_name": "skychat2",
+    "description": "A pretty good BlueSky app for desktop, mobile, and web",
     "start_url": "/",
     "display": "standalone",
     "background_color": "#000c15",
