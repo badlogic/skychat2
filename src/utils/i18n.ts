@@ -4,6 +4,36 @@ export interface Messages {
     "Invalid stream": string;
     "Sorry, an unknown error occured": string;
     "End of list": string;
+    footer: string;
+    Username: string;
+    "App password": string;
+    "Sign in": string;
+    "Explore BlueSky without account": string;
+    or: string;
+    "Could not sign in": string;
+    "Connecting ...": string;
+    Settings: string;
+    "Signed in as": string;
+    "Sign out": string;
+    "Allow pinch-zoom": string;
+    Moderation: string;
+    Dark: string;
+    Light: string;
+    "Muted words": string;
+    "Muted users": string;
+    "Muted threads": string;
+    "Blocked users": string;
+    "Moderation lists": string;
+    "Content filtering": string;
+    "Push notifications": string;
+    Enabled: string;
+    "New follower": string;
+    Replies: string;
+    Quotes: string;
+    Reposts: string;
+    Mentions: string;
+    Likes: string;
+    "User Interface": string;
 }
 
 const english: Messages = {
@@ -12,6 +42,38 @@ const english: Messages = {
     "Invalid stream": "Invalid stream",
     "Sorry, an unknown error occured": "Sorry, an unknown error occured",
     "End of list": "End of list",
+    footer: `Skychat is lovingly made by
+        <a href="https://skychat.social/#profile/badlogic.bsky.social" target="_blank">Mario Zechner</a><br />
+        <a href="https://github.com/badlogic/skychat2" target="_blank">Source code</a>`,
+    Username: "Username",
+    "App password": "App password",
+    "Sign in": "Sign in",
+    "Explore BlueSky without account": "Explore BlueSky without account",
+    or: "or",
+    "Could not sign in": "Could not sign in",
+    "Connecting ...": "Connecting ...",
+    Settings: "Settings",
+    "Signed in as": "Signed in as",
+    "Sign out": "Sign out",
+    "Allow pinch-zoom": "Allow pinch-zoom",
+    Moderation: "Moderation",
+    Dark: "Dark",
+    Light: "Light",
+    "Muted words": "Muted words",
+    "Muted users": "Muted users",
+    "Muted threads": "Muted threads",
+    "Blocked users": "Blocked users",
+    "Moderation lists": "Moderation lists",
+    "Content filtering": "Content filtering",
+    "Push notifications": "Push notifications",
+    Enabled: "Enabled",
+    "New follower": "New follower",
+    Replies: "Replies",
+    Quotes: "Quotes",
+    Reposts: "Reposts",
+    Mentions: "Mentions",
+    Likes: "Likes",
+    "User Interface": "User Interface",
 };
 
 export type LanguageCode = "en";

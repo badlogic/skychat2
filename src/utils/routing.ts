@@ -49,7 +49,7 @@ export class Router {
     addRoute<T extends HTMLElement>(
         path: string,
         renderPage: () => TemplateResult | T,
-        requiresAuth = false,
+        requiresAuth: boolean = false,
         reusePage: (page: T) => boolean = () => true
     ) {
         const route = new Route(path, renderPage, requiresAuth, reusePage);
@@ -60,8 +60,11 @@ export class Router {
     replace(path: string) {
         const page = this.pageStack.pop();
         page?.page.remove();
-        this.navigateTo(path);
-        history.replaceState({ page: history.state?.page ?? this.pageStack.length }, "", path);
+        if (this.navigateTo(path)) {
+            history.replaceState({ page: history.state?.page ?? this.pageStack.length }, "", path);
+        } else {
+            history.replaceState({ page: history.state?.page ?? this.pageStack.length }, "", this.rootRoute);
+        }
     }
 
     replaceUrl(path: string) {
@@ -128,11 +131,11 @@ export class Router {
         const route = this.matchRoute(path);
         if (!route) {
             this.navigateTo("/404");
-            return;
+            return false;
         }
         if (route.route.requiresAuth && !this.authProvider()) {
             this.navigateTo(this.rootRoute);
-            return;
+            return false;
         }
         const lastPage = this.top();
         if (lastPage && lastPage.route == route.route && route.route.reusePage(lastPage.page)) {
@@ -150,6 +153,7 @@ export class Router {
             this.pageStack.push({ route: route.route, page: pageDom, srcollTop: 0, display: pageDom.style.display });
             this.outlet.append(pageDom);
         }
+        return true;
     }
 
     disableNavigation = false;

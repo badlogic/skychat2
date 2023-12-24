@@ -1,78 +1,27 @@
-export type DevPreferences = {
-    enabled: boolean;
-};
+export class Store<T extends Record<keyof T, any>> {
+    memory = new Map<keyof T, any>();
 
-export type SynologyPreferences = {
-    downloadsFolder: string;
-};
-
-export type Theme = "dark" | "light";
-
-export type Settings = {
-    theme: Theme;
-    devPrefs: DevPreferences;
-};
-
-export type StoreKey = "user" | "settings";
-
-export class Store {
-    static memory = new Map<string, any>();
-
-    static {
-        let settings: Settings | undefined = Store.get<Settings>("settings");
-        settings = settings ?? ({} as Settings);
-
-        settings.theme = settings.theme ?? "dark";
-
-        settings.devPrefs = settings.devPrefs ?? ({} as DevPreferences);
-        settings.devPrefs.enabled = settings.devPrefs.enabled ?? false;
-
-        Store.set<Settings>("settings", settings);
-    }
-
-    private static get<T>(key: StoreKey): T | undefined {
+    get<K extends keyof T>(key: K): T[K] | undefined {
         try {
             let memResult = this.memory.get(key);
-            if (memResult) return memResult as T;
-            memResult = localStorage.getItem(key) ? (JSON.parse(localStorage.getItem(key)!) as T) : undefined;
+            if (memResult) return memResult as T[K];
+            memResult = localStorage.getItem(key.toString()) ? (JSON.parse(localStorage.getItem(key.toString())!) as T) : undefined;
             this.memory.set(key, memResult);
             return memResult;
         } catch (e) {
-            localStorage.removeItem(key);
+            localStorage.removeItem(key.toString());
             return undefined;
         }
     }
 
-    private static set<T>(key: StoreKey, value: T | undefined) {
+    set<K extends keyof T>(key: K, value: T[K] | undefined) {
         if (value == undefined) {
-            localStorage.removeItem(key);
+            localStorage.removeItem(key.toString());
             this.memory.delete(key);
         } else {
-            localStorage.setItem(key, JSON.stringify(value));
+            localStorage.setItem(key.toString(), JSON.stringify(value));
             this.memory.set(key, value);
         }
         return value;
     }
-
-    static getTheme() {
-        return Store.get<Settings>("settings")?.theme;
-    }
-
-    static setTheme(theme: Theme) {
-        Store.set("settings", { ...Store.get<Settings>("settings"), theme });
-
-        return theme;
-    }
-
-    static getDevPrefs() {
-        return Store.get<Settings>("settings")?.devPrefs;
-    }
-
-    static setDevPrefs(devPrefs: DevPreferences) {
-        Store.set("settings", { ...Store.get<Settings>("settings"), devPrefs });
-    }
 }
-
-const theme = Store.getTheme();
-if (theme == "dark") document.documentElement.classList.add("dark");
-else document.documentElement.classList.remove("dark");

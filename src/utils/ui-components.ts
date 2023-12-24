@@ -3,7 +3,6 @@ import { customElement, property, state } from "lit/decorators.js";
 import { map } from "lit/directives/map.js";
 import { errorIcon, arrowUpDoubleIcon, spinnerIcon, upDownIcon, moonIcon, sunIcon, settingsIcon, arrowLeftIcon, arrowRightIcon } from "./icons.js";
 import { router } from "./routing.js";
-import { Theme, Store } from "./store.js";
 
 export function dom(template: TemplateResult, container?: HTMLElement | DocumentFragment): HTMLElement[] {
     if (container) {
@@ -341,7 +340,7 @@ export class LoadingSpinner extends LitElement {
 
     render() {
         return html`<div class="w-full h-full flex items-center justify-center">
-            <i class="icon !w-8 !h-8 fill-primary animate-spin">${spinnerIcon}</i>
+            <i class="icon !w-8 !h-8 text-primary animate-spin">${spinnerIcon}</i>
         </div>`;
     }
 }
@@ -521,39 +520,6 @@ export class SelectBox<T> extends LitElement {
                 </button>
             </div>
         `;
-    }
-}
-
-@customElement("theme-toggle")
-export class ThemeToggle extends LitElement {
-    @state()
-    theme: Theme = "dark";
-
-    protected createRenderRoot(): Element | ShadowRoot {
-        return this;
-    }
-
-    connectedCallback(): void {
-        super.connectedCallback();
-        this.theme = Store.getTheme() ?? "dark";
-        this.setTheme(this.theme);
-    }
-
-    setTheme(theme: Theme) {
-        Store.setTheme(theme);
-        if (theme == "dark") document.documentElement.classList.add("dark");
-        else document.documentElement.classList.remove("dark");
-    }
-
-    toggleTheme() {
-        this.theme = this.theme == "dark" ? "light" : "dark";
-        this.setTheme(this.theme);
-    }
-
-    render() {
-        return html`<button class="flex items-center justify-center w-full h-full" @click=${this.toggleTheme}>
-            <i class="icon !w-5 !h-5">${this.theme == "dark" ? moonIcon : sunIcon}</i>
-        </button>`;
     }
 }
 
@@ -819,5 +785,27 @@ export class ImageGallery extends LitElement {
         this.scrollTimeout = window.setTimeout(() => {
             this.isScrolling = false;
         }, 100);
+    }
+}
+
+export class BaseElement extends LitElement {
+    protected createRenderRoot(): Element | ShadowRoot {
+        return this;
+    }
+
+    protected updated(_changedProperties: PropertyValueMap<any> | Map<PropertyKey, unknown>): void {
+        super.updated(_changedProperties);
+        fixLinksAndVideos(this);
+    }
+}
+
+export class SubscribedElement extends BaseElement {
+    readonly subscriptions: (() => void)[] = [];
+
+    disconnectedCallback(): void {
+        super.disconnectedCallback();
+        for (const subscription of this.subscriptions) {
+            subscription();
+        }
     }
 }
