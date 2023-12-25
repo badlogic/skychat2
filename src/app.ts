@@ -11,6 +11,7 @@ import "./appstate.js";
 import { BlueSky } from "./apis/bluesky.js";
 import { store } from "./appstate.js";
 import { LoginPage } from "./pages/login.js";
+import { pageContainerStyle, pageContentStyle } from "./utils/styles.js";
 
 setupLiveReload();
 
@@ -28,7 +29,13 @@ export class App extends LitElement {
 
         super.firstUpdated(_changedProperties);
         router.addRoute("/", () => html`<login-page></login-page>`);
-        router.addRoute("/404", () => renderError(i18n("Whoops, that page doesn't exist")));
+        router.addRoute(
+            "/404",
+            () =>
+                html`<div class="${pageContainerStyle}">
+                    <div class="${pageContentStyle}">${renderError(i18n("Whoops, that page doesn't exist"))}</div>
+                </div>`
+        );
 
         router.addRoute("/settings", () => html`<settings-page></settings-page>`, true);
         router.addRoute("/home", () => html`<home-page></home-page>`, true);
