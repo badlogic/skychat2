@@ -1,5 +1,8 @@
-import { JsonValue } from "./server/key-value-store.js";
 import { error } from "./utils/utils.js";
+
+export interface JsonValue {
+    [key: string]: any;
+}
 
 function apiBaseUrl() {
     if (typeof location === "undefined") return "http://localhost:3333/api/";
@@ -63,4 +66,8 @@ export class Api {
     static async registerPush(token: string, did: string) {}
 
     static async unregisterPush(token: string) {}
+
+    static async numQuotes(uris: string[]) {
+        return apiGet<Record<string, number>>("numquotes?" + uris.map((uri) => `uri=${encodeURIComponent(uri)}&`).join(""));
+    }
 }

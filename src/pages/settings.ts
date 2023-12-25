@@ -1,14 +1,14 @@
 import { PropertyValueMap, html, nothing } from "lit";
 import { customElement, property } from "lit/decorators.js";
-import { BaseElement, closeButton, dom, renderTopbar } from "../app.js";
+import { BlueSky } from "../apis/bluesky.js";
+import { BaseElement, renderTopbar } from "../app.js";
+import { store } from "../appstate.js";
+import { i18n } from "../utils/i18n.js";
+import { arrowRightIcon, bellIcon, brushIcon, shieldIcon } from "../utils/icons.js";
+import { router } from "../utils/routing.js";
 import { pageContainerStyle, pageContentStyle } from "../utils/styles.js";
 import { error } from "../utils/utils.js";
-import { i18n } from "../utils/i18n.js";
-import { Theme, store } from "../appstate.js";
-import { BlueSky } from "../apis/bluesky.js";
-import { router } from "../utils/routing.js";
-import { brushIcon, shieldIcon, arrowRightIcon, bellIcon } from "../utils/icons.js";
-import { Store } from "../utils/store.js";
+import { Theme } from "../common.js";
 
 type Version = { date: string; commit: string };
 
@@ -16,6 +16,10 @@ type Version = { date: string; commit: string };
 export class SettingsPage extends BaseElement {
     @property()
     version?: Version;
+
+    constructor() {
+        super();
+    }
 
     protected firstUpdated(_changedProperties: PropertyValueMap<any> | Map<PropertyKey, unknown>): void {
         super.firstUpdated(_changedProperties);

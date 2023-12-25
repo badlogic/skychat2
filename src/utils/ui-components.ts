@@ -194,6 +194,29 @@ export function renderError(error: string) {
         <div>${error}</div>
     </div>`;
 }
+
+export class BaseElement extends LitElement {
+    protected createRenderRoot(): Element | ShadowRoot {
+        return this;
+    }
+
+    protected updated(_changedProperties: PropertyValueMap<any> | Map<PropertyKey, unknown>): void {
+        super.updated(_changedProperties);
+        fixLinksAndVideos(this);
+    }
+}
+
+export class SubscribedElement extends BaseElement {
+    readonly subscriptions: (() => void)[] = [];
+
+    disconnectedCallback(): void {
+        super.disconnectedCallback();
+        for (const subscription of this.subscriptions) {
+            subscription();
+        }
+    }
+}
+
 export abstract class FloatingButton extends LitElement {
     @property()
     highlight = false;
@@ -596,7 +619,7 @@ export function renderTopbar(
 }
 
 @customElement("top-bar")
-export class Topbar extends LitElement {
+export class Topbar extends BaseElement {
     @property()
     heading?: TemplateResult;
 
@@ -655,11 +678,8 @@ export function fixLinksAndVideos(container: HTMLElement, collapsed = false) {
                     ev.stopImmediatePropagation();
                     if (link.pathname == location.pathname) return;
                     const navs = new Set<string>(["/home", "/settings", "/hashtags", "/lists", "/feeds", "/search", "/notifications"]);
-                    if (navs.has(link.pathname)) {
-                        router.popAll(link.pathname);
-                    } else {
-                        router.push(link.pathname);
-                    }
+
+                    router.push(link.pathname);
                 });
             }
             link.addEventListener("click", (ev) => {
@@ -791,27 +811,5 @@ export class ImageGallery extends LitElement {
         this.scrollTimeout = window.setTimeout(() => {
             this.isScrolling = false;
         }, 100);
-    }
-}
-
-export class BaseElement extends LitElement {
-    protected createRenderRoot(): Element | ShadowRoot {
-        return this;
-    }
-
-    protected updated(_changedProperties: PropertyValueMap<any> | Map<PropertyKey, unknown>): void {
-        super.updated(_changedProperties);
-        fixLinksAndVideos(this);
-    }
-}
-
-export class SubscribedElement extends BaseElement {
-    readonly subscriptions: (() => void)[] = [];
-
-    disconnectedCallback(): void {
-        super.disconnectedCallback();
-        for (const subscription of this.subscriptions) {
-            subscription();
-        }
     }
 }

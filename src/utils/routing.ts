@@ -11,14 +11,17 @@ export class Route<T extends HTMLElement> {
         readonly path: string,
         readonly renderPage: () => TemplateResult | T,
         readonly requiresAuth = false,
-        readonly reusePage: (page: T) => boolean = () => true
+        readonly reusePage: (page: T) => boolean = () => true,
+        readonly removePage = true
     ) {
         this.regexp = pathToRegexp(this.path, this.keys);
     }
 }
 
+export type RouterPage = { route: Route<any>; page: HTMLElement; srcollTop: number; display: string };
+
 export class Router {
-    pageStack: { route: Route<any>; page: HTMLElement; srcollTop: number; display: string }[] = [];
+    pageStack: RouterPage[] = [];
     routes: Route<any>[] = [];
     authProvider = () => true;
     rootRoute = "/";
@@ -51,9 +54,10 @@ export class Router {
         path: string,
         renderPage: () => TemplateResult | T,
         requiresAuth: boolean = false,
-        reusePage: (page: T) => boolean = () => true
+        reusePage: (page: T) => boolean = () => true,
+        removePage = true
     ) {
-        const route = new Route(path, renderPage, requiresAuth, reusePage);
+        const route = new Route(path, renderPage, requiresAuth, reusePage, removePage);
         if (this.routes.some((other) => other.path == route.path)) throw new Error(`Route ${route.path}} already defined`);
         this.routes.push(route);
     }
@@ -74,14 +78,14 @@ export class Router {
         history.replaceState({ page: history.state?.page ?? this.pageStack.length }, "", path);
     }
 
-    push(path: string, page?: HTMLElement) {
+    push(path: string) {
         if (location.pathname == path) return;
         history.pushState({ page: this.pageStack.length + 1 }, "", path);
         const route = this.matchRoute(path);
         if (!route) {
             this.navigateTo("/404");
         } else {
-            this.navigateTo(path, page);
+            this.navigateTo(path);
         }
         this.currPage++;
         this.notifyListeners(path);
@@ -144,7 +148,24 @@ export class Router {
         }
     }
 
-    private navigateTo(path: string, prerenderedPage?: HTMLElement) {
+    private savePage(page: RouterPage) {
+        page.srcollTop = getScrollParent(this.outlet)!.scrollTop;
+        page.display = page.page.style.display;
+        const streamViews = Array.from(page.page.querySelectorAll("*")).filter((el) => el instanceof StreamView) as StreamView<any>[];
+        for (const streamView of streamViews) streamView.disableIntersector = true;
+        page.page.style.display = "none";
+    }
+
+    private restorePage(page: RouterPage) {
+        this.pageStack = this.pageStack.filter((other) => other != page);
+        this.pageStack.push(page);
+        const streamViews = Array.from(page.page.querySelectorAll("*")).filter((el) => el instanceof StreamView) as StreamView<any>[];
+        for (const streamView of streamViews) streamView.disableIntersector = false;
+        page.page.style.display = page.display;
+        queueMicrotask(() => (getScrollParent(this.outlet)!.scrollTop = page.srcollTop));
+    }
+
+    private navigateTo(path: string) {
         const route = this.matchRoute(path);
         if (!route) {
             this.navigateTo("/404");
@@ -154,19 +175,15 @@ export class Router {
             this.navigateTo(this.rootRoute);
             return false;
         }
-        const lastPage = this.top();
-        if (lastPage && lastPage.route == route.route && route.route.reusePage(lastPage.page)) {
-            console.log("Re-using existing page");
+
+        if (this.top()) this.savePage(this.top()!);
+        const matchingPage = this.pageStack.find((page) => page.route == route.route);
+        if (matchingPage) {
+            this.restorePage(matchingPage);
         } else {
-            const page = prerenderedPage ?? route.route.renderPage();
-            if (lastPage) {
-                lastPage.srcollTop = getScrollParent(this.outlet)!.scrollTop;
-                lastPage.display = lastPage.page.style.display;
-                const streamViews = Array.from(lastPage.page.querySelectorAll("*")).filter((el) => el instanceof StreamView) as StreamView<any>[];
-                for (const streamView of streamViews) streamView.disableIntersector = true;
-                lastPage.page.style.display = "none";
-            }
+            const page = route.route.renderPage();
             const pageDom = page instanceof HTMLElement ? page : dom(page)[0];
+            getScrollParent(this.outlet)!.scrollTop = 0;
             this.pageStack.push({ route: route.route, page: pageDom, srcollTop: 0, display: pageDom.style.display });
             this.outlet.append(pageDom);
         }
@@ -201,17 +218,15 @@ export class Router {
             this.currPage = ev.state.page;
             // Backward
             const page = this.pageStack.pop();
-            page?.page.remove();
-            queueMicrotask(() => {
-                const page = this.top();
-                if (page) {
-                    const streamViews = Array.from(page.page.querySelectorAll("*")).filter((el) => el instanceof StreamView) as StreamView<any>[];
-                    for (const streamView of streamViews) streamView.disableIntersector = false;
-                    page.page.style.display = page.display;
-                    queueMicrotask(() => (getScrollParent(this.outlet)!.scrollTop = page.srcollTop));
+            if (page) {
+                if (page.route.removePage) {
+                    page.page.remove();
                 } else {
-                    this.navigateTo(location.pathname);
+                    this.pageStack.push(page);
                 }
+            }
+            queueMicrotask(() => {
+                this.navigateTo(location.pathname);
                 this.notifyListeners(location.pathname);
             });
         }

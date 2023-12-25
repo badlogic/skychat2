@@ -35,6 +35,15 @@ export interface Messages {
     Likes: string;
     "User Interface": string;
     Home: string;
+    "is following you": (handle: string) => string;
+    "liked your post": (handle: string) => string;
+    "quoted your post": (handle: string) => string;
+    "replied to your post": (handle: string) => string;
+    "reposted your post": (handle: string) => string;
+    "mentioned you": (handle: string) => string;
+    "You have a new notification": string;
+    "New notification": string;
+    "Not signed in": string;
 }
 
 const english: Messages = {
@@ -76,6 +85,15 @@ const english: Messages = {
     Likes: "Likes",
     "User Interface": "User Interface",
     Home: "Home",
+    "is following you": (handle: string) => handle + " is following you",
+    "liked your post": (handle: string) => handle + " liked your post",
+    "quoted your post": (handle: string) => handle + " quoted your post",
+    "replied to your post": (handle: string) => handle + " replied to your post",
+    "reposted your post": (handle: string) => handle + " reposted your post",
+    "mentioned you": (handle: string) => handle + " mentioned you",
+    "You have a new notification": "You have a new notification",
+    "New notification": "New notification",
+    "Not signed in": "Not signed in",
 };
 
 export type LanguageCode = "en";

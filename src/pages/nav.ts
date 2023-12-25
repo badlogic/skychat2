@@ -9,10 +9,6 @@ import { router } from "../utils/routing.js";
 
 @customElement("bottom-nav-bar")
 export class BottomNavBar extends BaseElement {
-    protected createRenderRoot(): Element | ShadowRoot {
-        return this;
-    }
-
     @property()
     hide = false;
 
@@ -33,6 +29,7 @@ export class BottomNavBar extends BaseElement {
             else button.classList.remove("!text-primary");
         }
     };
+
     connectedCallback(): void {
         super.connectedCallback();
         this.scrollParent = getScrollParent(this);
@@ -65,10 +62,10 @@ export class BottomNavBar extends BaseElement {
         return html`<div class="${baseStyle} ${mobileStyle} ${desktopStyle}">
             <div class="flex justify-between md:flex-col md:justify-start md:align-center md:gap-2">
                 <up-button class="absolute"></up-button>
-                <a id="home" href="/home" class="text-black dark:text-white flex items-center justify-center w-12 h-12">
+                <a href="/home" class="text-black dark:text-white flex items-center justify-center w-12 h-12">
                     <i class="icon w-6 h-6">${homeIcon}</i>
                 </a>
-                <a href="/settings" class="text-black dark:text-white flex items-center justify-center w-12 h-12">
+                <a href="/settings" class="hidden md:flex text-black dark:text-white flex items-center justify-center w-12 h-12">
                     <i class="icon w-6 h-6">${settingsIcon}</i>
                 </a>
                 <a href="/hashtags" class="text-black dark:text-white flex items-center justify-center w-12 h-12">

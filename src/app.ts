@@ -34,11 +34,26 @@ export class App extends LitElement {
             () =>
                 html`<div class="${pageContainerStyle}">
                     <div class="${pageContentStyle}">${renderError(i18n("Whoops, that page doesn't exist"))}</div>
-                </div>`
+                </div>`,
+            false,
+            () => true,
+            false
         );
 
-        router.addRoute("/settings", () => html`<settings-page></settings-page>`, true);
-        router.addRoute("/home", () => html`<home-page></home-page>`, true);
+        router.addRoute(
+            "/settings",
+            () => html`<settings-page></settings-page>`,
+            true,
+            (page) => true,
+            false
+        );
+        router.addRoute(
+            "/home",
+            () => html`<home-page></home-page>`,
+            true,
+            (page) => true,
+            false
+        );
 
         router.setRootRoute("/");
         router.setNotFoundRoot("/404");

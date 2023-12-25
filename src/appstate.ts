@@ -1,36 +1,5 @@
-import { AtpSessionData } from "@atproto/api";
-import { ProfileViewDetailed } from "@atproto/api/dist/client/types/app/bsky/actor/defs.js";
+import { DevPreferences, PushPreferences, Theme, User } from "./common.js";
 import { Store } from "./utils/store.js";
-
-export type User = {
-    account: string;
-    password: string;
-    session?: AtpSessionData;
-    profile: ProfileViewDetailed;
-    pushToken?: string;
-};
-
-export type PushPreferences = {
-    enabled: boolean;
-    newFollowers: boolean;
-    replies: boolean;
-    quotes: boolean;
-    reposts: boolean;
-    mentions: boolean;
-    likes: boolean;
-};
-
-export type DevPreferences = {
-    enabled: boolean;
-    logPostViewRenders: boolean;
-    logFeedViewPostRenders: boolean;
-    logEmbedRenders: boolean;
-    logThreadViewPostRenders: boolean;
-    logStreamViewAppended: boolean;
-    logStreamViewPrepended: boolean;
-};
-
-export type Theme = "dark" | "light";
 
 export type StoreConfig = {
     user: User;

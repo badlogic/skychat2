@@ -2,7 +2,7 @@ import { error } from "./utils";
 
 export type StreamPage<T> = { cursor?: string; items: T[] };
 
-export type StreamProvider<T> = (cursor?: string, limit?: number, notify?: boolean) => Promise<Error | StreamPage<T>>;
+export type StreamProvider<T> = (cursor?: string) => Promise<Error | StreamPage<T>>;
 
 export abstract class Stream<T> {
     pages: StreamPage<T>[] = [];
@@ -25,7 +25,7 @@ export abstract class Stream<T> {
             let cursor: string | undefined;
             let startTimestamp = this.pages.length > 0 ? this.getItemDate(this.pages[0].items[0]).getTime() : new Date().getTime();
             while (true) {
-                let fetchedItems = await this.provider(cursor, 20, false);
+                let fetchedItems = await this.provider(cursor);
                 if (fetchedItems instanceof Error) {
                     for (const listener of this.newItemslisteners) {
                         listener(fetchedItems);

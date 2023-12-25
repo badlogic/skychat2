@@ -23,6 +23,7 @@ services:
             DATABASE_USER: ${SKYCHAT2_DB_USER}
             DATABASE_PASSWORD: ${SKYCHAT2_DB_PASSWORD}
         volumes:
+            - ~/firebase-service-credentials.json:/firebase-service-credentials.json
             - ./data:/data
             - ../:/app
         links:
