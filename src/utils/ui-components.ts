@@ -154,7 +154,7 @@ export function getScrollParent(parent: HTMLElement | Node | null) {
         if (parent == document.documentElement) return parent as HTMLElement;
         parent = parent.parentNode;
     }
-    return null;
+    return undefined;
 }
 
 function resetAnimation(el: HTMLElement) {
@@ -269,7 +269,7 @@ export class UpButton extends FloatingButton {
         scrollParent?.scrollTo({ top: 0, behavior: "smooth" });
     };
 
-    scrollParent: HTMLElement | null = null;
+    scrollParent?: HTMLElement;
 
     constructor() {
         super();

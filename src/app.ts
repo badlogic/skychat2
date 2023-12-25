@@ -24,6 +24,8 @@ export class App extends LitElement {
     }
 
     protected firstUpdated(_changedProperties: PropertyValueMap<any> | Map<PropertyKey, unknown>): void {
+        document.title = "Skychat";
+
         super.firstUpdated(_changedProperties);
         router.addRoute("/", () => html`<login-page></login-page>`);
         router.addRoute("/404", () => renderError(i18n("Whoops, that page doesn't exist")));

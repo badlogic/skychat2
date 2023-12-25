@@ -31,6 +31,8 @@ export class SettingsPage extends BaseElement {
     renderProfile(profile: any) {}
 
     render() {
+        document.title = "Skychat - " + i18n("Settings");
+
         const user = store.get("user");
         const pushPrefs = store.get("pushPrefs")!;
         const devPrefs = store.get("devPrefs")!;
@@ -229,6 +231,7 @@ export class SettingsPage extends BaseElement {
         BlueSky.logout();
         router.popAll("/");
         (document.body.querySelector("app-main") as any).requestUpdate();
+        document.title = "Skychat";
     }
 
     setTheme(theme: Theme) {

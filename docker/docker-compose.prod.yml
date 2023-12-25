@@ -2,8 +2,8 @@ version: "3"
 services:
     web:
         environment:
-            VIRTUAL_HOST: skychat.marioslab.io,www.skychat.marioslab.io
-            LETSENCRYPT_HOST: skychat.marioslab.io,www.skychat.marioslab.io
+            VIRTUAL_HOST: skychat.marioslab.io
+            LETSENCRYPT_HOST: skychat.marioslab.io
             LETSENCRYPT_EMAIL: badlogicgames@gmail.com
         networks:
             - reverse_proxy

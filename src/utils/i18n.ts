@@ -34,6 +34,7 @@ export interface Messages {
     Mentions: string;
     Likes: string;
     "User Interface": string;
+    Home: string;
 }
 
 const english: Messages = {
@@ -74,6 +75,7 @@ const english: Messages = {
     Mentions: "Mentions",
     Likes: "Likes",
     "User Interface": "User Interface",
+    Home: "Home",
 };
 
 export type LanguageCode = "en";

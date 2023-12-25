@@ -15,6 +15,7 @@ export class BottomNavBar extends BaseElement {
     @property()
     hide = false;
 
+    scrollParent?: HTMLElement;
     lastScrollTop = 0;
     scrollHandler = () => this.handleScroll();
     handleScroll() {
@@ -27,8 +28,8 @@ export class BottomNavBar extends BaseElement {
 
     connectedCallback(): void {
         super.connectedCallback();
-        const scrollParent = getScrollParent(this);
-        if (scrollParent == document.documentElement) {
+        this.scrollParent = getScrollParent(this);
+        if (this.scrollParent == document.documentElement) {
             window.addEventListener("scroll", this.scrollHandler);
         } else {
             getScrollParent(this)!.addEventListener("scroll", this.scrollHandler);
@@ -37,14 +38,15 @@ export class BottomNavBar extends BaseElement {
 
     disconnectedCallback(): void {
         super.disconnectedCallback();
-        getScrollParent(this)!.removeEventListener("scroll", this.scrollHandler);
+        window.removeEventListener("scroll", this.scrollHandler);
+        this.scrollParent?.removeEventListener("scroll", this.scrollHandler);
     }
 
     render() {
         const animationStyle = `transition-transform  ${this.hide ? "translate-y-full md:translate-y-0" : "translate-y-0"}`;
         const baseStyle = `${animationStyle} fixed border-t border-divider backdrop-blur-[8px] z-20 bg-[#fff]/80 dark:bg-[#111]/80`;
-        const mobileStyle = `w-full left-0 bottom-0 px-2`;
-        const desktopStyle = `md:px-0 md:w-auto md:border-none md:top-0 md:left-[calc(50vw-320px-56px)]`;
+        const mobileStyle = `w-full bottom-0 px-2`;
+        const desktopStyle = `md:px-0 md:w-12 md:border-none md:top-0 md:right-[calc(50vw+320px)]`;
 
         return html`<div class="${baseStyle} ${mobileStyle} ${desktopStyle}">
             <div class="flex justify-between md:flex-col md:justify-start md:align-center md:gap-2">

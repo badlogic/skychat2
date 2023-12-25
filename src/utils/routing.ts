@@ -72,6 +72,7 @@ export class Router {
     }
 
     push(path: string, page?: HTMLElement) {
+        if (location.pathname == path) return;
         history.pushState({ page: this.pageStack.length }, "", path);
         const route = this.matchRoute(path);
         if (!route) {
