@@ -39,7 +39,7 @@ export class SettingsPage extends BaseElement {
 
         return html`<div class="${pageContainerStyle}">
             ${renderTopbar(i18n("Settings"))}
-            <div class="${pageContentStyle}">
+            <div class="${pageContentStyle} mb-12">
                 ${user
                     ? html`<div class="px-4 h-12 flex items-center font-semibold">${i18n("Signed in as")}</div>
                           <div class="px-4 flex gap-4">
@@ -47,7 +47,7 @@ export class SettingsPage extends BaseElement {
                               <button class="btn ml-auto" @click=${this.logout}>${i18n("Sign out")}</button>
                           </div>`
                     : nothing}
-                <div class="mt-4 border-t border-divider"></div>
+                <div class="mt-8 mb-4 border-t border-divider"></div>
                 <div class="px-4 h-12 flex items-center font-semibold gap-2"><i class="icon !w-5 !h-5">${brushIcon}</i>${i18n("User Interface")}</div>
                 <button-group
                     @change=${(ev: CustomEvent) => this.setTheme(ev.detail.value)}
@@ -58,7 +58,7 @@ export class SettingsPage extends BaseElement {
                     .selected=${store.get("theme")}
                     class="px-4 self-start"
                 ></button-group>
-                <div class="mt-4 border-t border-divider"></div>
+                <div class="mt-8 mb-4 border-t border-divider"></div>
                 <div class="px-4 h-12 flex items-center font-semibold gap-2"><i class="icon !w-5 !h-5">${shieldIcon}</i>${i18n("Moderation")}</div>
                 <div class="px-4 flex flex-col gap-2">
                     <a href="/muted-words" class="border border-muted rounded-md pl-4 py-2 flex items-center fancy-shadow">
@@ -80,7 +80,7 @@ export class SettingsPage extends BaseElement {
                         <span>${i18n("Content filtering")}</span><i class="icon !w-8 !h-8 fill-primary ml-auto">${arrowRightIcon}</i>
                     </a>
                 </div>
-                <div class="mt-4 border-t border-divider"></div>
+                <div class="mt-8 mb-4 border-t border-divider"></div>
                 <div class="px-4 h-12 flex items-center font-semibold gap-2">
                     <i class="icon !w-5 !h-5">${bellIcon}</i>${i18n("Push notifications")}
                 </div>
@@ -150,13 +150,13 @@ export class SettingsPage extends BaseElement {
                               }}
                           ></slide-button>`
                     : nothing}
-                <div class="mt-4 border-t border-divider"></div>
+                <div class="mt-8 mb-4 border-t border-divider"></div>
                 <div class="px-4 mt-4 text-xs">
                     Build: ${this.version?.date}<br />
                     <a href="https://github.com/badlogic/skychat/commit/">${this.version?.commit}</a>
                 </div>
                 <slide-button
-                    class="px-4 mt-4 mb-4"
+                    class="px-4 mt-4"
                     .checked=${devPrefs.enabled}
                     .text=${"Dev mode"}
                     @changed=${(ev: CustomEvent) => {
@@ -168,7 +168,7 @@ export class SettingsPage extends BaseElement {
                 ${devPrefs.enabled
                     ? html`
                           <slide-button
-                              class="px-4 mt-4 mb-4"
+                              class="px-4 mt-4"
                               .checked=${devPrefs.logEmbedRenders}
                               .text=${"Log embed renders"}
                               @changed=${(ev: CustomEvent) => {
@@ -177,7 +177,7 @@ export class SettingsPage extends BaseElement {
                               }}
                           ></slide-button>
                           <slide-button
-                              class="px-4 mt-4 mb-4"
+                              class="px-4 mt-4"
                               .checked=${devPrefs.logPostViewRenders}
                               .text=${"Log PostView renders"}
                               @changed=${(ev: CustomEvent) => {
@@ -186,7 +186,7 @@ export class SettingsPage extends BaseElement {
                               }}
                           ></slide-button>
                           <slide-button
-                              class="px-4 mt-4 mb-4"
+                              class="px-4 mt-4"
                               .checked=${devPrefs.logFeedViewPostRenders}
                               .text=${"Log FeedViewPost renders"}
                               @changed=${(ev: CustomEvent) => {
@@ -195,7 +195,7 @@ export class SettingsPage extends BaseElement {
                               }}
                           ></slide-button>
                           <slide-button
-                              class="px-4 mt-4 mb-4"
+                              class="px-4 mt-4"
                               .checked=${devPrefs.logThreadViewPostRenders}
                               .text=${"Log ThreadViewPost renders"}
                               @changed=${(ev: CustomEvent) => {
@@ -204,7 +204,7 @@ export class SettingsPage extends BaseElement {
                               }}
                           ></slide-button>
                           <slide-button
-                              class="px-4 mt-4 mb-4"
+                              class="px-4 mt-4"
                               .checked=${devPrefs.logStreamViewAppended}
                               .text=${"Log StreamView appends"}
                               @changed=${(ev: CustomEvent) => {
@@ -213,7 +213,7 @@ export class SettingsPage extends BaseElement {
                               }}
                           ></slide-button>
                           <slide-button
-                              class="px-4 mt-4 mb-4"
+                              class="px-4 mt-4"
                               .checked=${devPrefs.logStreamViewPrepended}
                               .text=${"Log StreamView prepend"}
                               @changed=${(ev: CustomEvent) => {

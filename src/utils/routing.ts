@@ -76,7 +76,7 @@ export class Router {
 
     push(path: string, page?: HTMLElement) {
         if (location.pathname == path) return;
-        history.pushState({ page: this.pageStack.length }, "", path);
+        history.pushState({ page: this.pageStack.length + 1 }, "", path);
         const route = this.matchRoute(path);
         if (!route) {
             this.navigateTo("/404");
@@ -91,7 +91,7 @@ export class Router {
         this.modal = modal;
         this.currPage++;
         this.outlet.append(modal);
-        history.pushState({ page: this.pageStack.length }, "", location.href);
+        history.pushState({ page: this.pageStack.length + 1 }, "", location.href);
     }
 
     pop() {
