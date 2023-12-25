@@ -117,7 +117,13 @@ export class Router {
             }
         };
         window.addEventListener("popstate", popState);
-        history.back();
+        if (history.state?.page == 1) {
+            this.replace(path);
+            this.currPage = 1;
+            this.disableNavigation = false;
+        } else {
+            history.back();
+        }
     }
 
     top() {

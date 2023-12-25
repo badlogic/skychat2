@@ -38,7 +38,7 @@ export class SettingsPage extends BaseElement {
         const devPrefs = store.get("devPrefs")!;
 
         return html`<div class="${pageContainerStyle}">
-            ${renderTopbar(i18n("Settings"), closeButton())}
+            ${renderTopbar(i18n("Settings"))}
             <div class="${pageContentStyle} px-4">
                 ${user
                     ? html`<div class="px-4 h-12 flex items-center font-semibold">${i18n("Signed in as")}</div>

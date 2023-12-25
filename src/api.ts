@@ -59,4 +59,8 @@ export class Api {
     static async hello() {
         return apiGet<{ message: string }>("hello");
     }
+
+    static async registerPush(token: string, did: string) {}
+
+    static async unregisterPush(token: string) {}
 }

@@ -26,6 +26,8 @@ export class BottomNavBar extends BaseElement {
         this.lastScrollTop = getScrollParent(this.parentElement)!.scrollTop;
     }
 
+    popListener = () => this.navigated();
+
     connectedCallback(): void {
         super.connectedCallback();
         this.scrollParent = getScrollParent(this);
@@ -34,12 +36,19 @@ export class BottomNavBar extends BaseElement {
         } else {
             getScrollParent(this)!.addEventListener("scroll", this.scrollHandler);
         }
+
+        window.addEventListener("popstate", this.popListener);
     }
 
     disconnectedCallback(): void {
         super.disconnectedCallback();
         window.removeEventListener("scroll", this.scrollHandler);
         this.scrollParent?.removeEventListener("scroll", this.scrollHandler);
+        window.removeEventListener("popstate", this.popListener);
+    }
+
+    navigated() {
+        this.requestUpdate();
     }
 
     render() {
@@ -49,9 +58,9 @@ export class BottomNavBar extends BaseElement {
         const desktopStyle = `md:px-0 md:w-12 md:border-none md:top-0 md:right-[calc(50vw+320px)]`;
 
         return html`<div class="${baseStyle} ${mobileStyle} ${desktopStyle}">
-            <div class="flex justify-between md:flex-col md:justify-start md:align-center md:gap-2">
+            <div class="flex justify-between md:flex-col md:justify-start md:align-center">
                 <up-button class="absolute"></up-button>
-                <a href="/home" class="text-black dark:text-white flex items-center justify-center w-12 h-12">
+                <a id="home" href="/home" class="text-black dark:text-white flex items-center justify-center w-12 h-12">
                     <i class="icon w-6 h-6">${homeIcon}</i>
                 </a>
                 <a href="/settings" class="text-black dark:text-white flex items-center justify-center w-12 h-12">

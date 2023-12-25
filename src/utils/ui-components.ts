@@ -617,7 +617,7 @@ export class Topbar extends LitElement {
         return html`
             <div class="fixed top-0 left-0 z-10 w-screen h-10 flex items-center bg-[#fff]/60 dark:bg-[#111]/60 backdrop-blur-[8px]">
                 <div class="w-full ${this.limitWidth ? "max-w-[640px]" : ""} mx-auto h-10 pr-4 flex items-center">
-                    <div class="flex-shrink-0">${this.closeButton}</div>
+                    ${this.closeButton ? html`<div class="flex-shrink-0">${this.closeButton}</div>` : html`<div class="w-8"></div>`}
                     ${this.heading instanceof HTMLElement
                         ? this.heading
                         : html`<span class="font-semibold truncate overflow-hidden">${this.heading}</span>`}
@@ -653,7 +653,13 @@ export function fixLinksAndVideos(container: HTMLElement, collapsed = false) {
                     ev.preventDefault();
                     ev.stopPropagation();
                     ev.stopImmediatePropagation();
-                    router.push(link.pathname);
+                    if (link.pathname == location.pathname) return;
+                    const navs = new Set<string>(["/home", "/settings", "/hashtags", "/lists", "/feeds", "/search", "/notifications"]);
+                    if (navs.has(link.pathname)) {
+                        router.popAll(link.pathname);
+                    } else {
+                        router.push(link.pathname);
+                    }
                 });
             }
             link.addEventListener("click", (ev) => {
