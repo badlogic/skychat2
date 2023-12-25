@@ -1,10 +1,11 @@
-import { LitElement, html } from "lit";
+import { LitElement, PropertyValueMap, html } from "lit";
 import { customElement, property } from "lit/decorators.js";
 import { getScrollParent, dom, BaseElement } from "../app.js";
 import { bellIcon, cloudIcon, hashIcon, homeIcon, listIcon, searchIcon, settingsIcon } from "../utils/icons.js";
 import { Store } from "../utils/store.js";
 import { store } from "../appstate.js";
 import { defaultAvatar } from "./default-icons.js";
+import { router } from "../utils/routing.js";
 
 @customElement("bottom-nav-bar")
 export class BottomNavBar extends BaseElement {
@@ -26,8 +27,12 @@ export class BottomNavBar extends BaseElement {
         this.lastScrollTop = getScrollParent(this.parentElement)!.scrollTop;
     }
 
-    popListener = () => this.navigated();
-
+    navListener = (pathname: string) => {
+        for (const button of Array.from(this.querySelectorAll("a"))) {
+            if (button.pathname == pathname) button.classList.add("!text-primary");
+            else button.classList.remove("!text-primary");
+        }
+    };
     connectedCallback(): void {
         super.connectedCallback();
         this.scrollParent = getScrollParent(this);
@@ -36,19 +41,19 @@ export class BottomNavBar extends BaseElement {
         } else {
             getScrollParent(this)!.addEventListener("scroll", this.scrollHandler);
         }
-
-        window.addEventListener("popstate", this.popListener);
+        router.listeners.push(this.navListener);
     }
 
     disconnectedCallback(): void {
         super.disconnectedCallback();
         window.removeEventListener("scroll", this.scrollHandler);
         this.scrollParent?.removeEventListener("scroll", this.scrollHandler);
-        window.removeEventListener("popstate", this.popListener);
+        router.listeners = router.listeners.filter((listener) => listener != this.navListener);
     }
 
-    navigated() {
-        this.requestUpdate();
+    protected firstUpdated(_changedProperties: PropertyValueMap<any> | Map<PropertyKey, unknown>): void {
+        super.firstUpdated(_changedProperties);
+        this.navListener(location.pathname);
     }
 
     render() {

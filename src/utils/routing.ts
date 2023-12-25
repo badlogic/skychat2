@@ -26,6 +26,7 @@ export class Router {
     currPage = 0;
     modal?: HTMLElement;
     outlet = document.body;
+    listeners: ((pathname: string) => void)[] = [];
 
     constructor() {
         window.addEventListener("popstate", (ev) => this.handleNavigation(ev));
@@ -62,8 +63,10 @@ export class Router {
         page?.page.remove();
         if (this.navigateTo(path)) {
             history.replaceState({ page: history.state?.page ?? this.pageStack.length }, "", path);
+            this.notifyListeners(path);
         } else {
             history.replaceState({ page: history.state?.page ?? this.pageStack.length }, "", this.rootRoute);
+            this.notifyListeners(this.rootRoute);
         }
     }
 
@@ -81,6 +84,7 @@ export class Router {
             this.navigateTo(path, page);
         }
         this.currPage++;
+        this.notifyListeners(path);
     }
 
     pushModal(modal: HTMLElement) {
@@ -134,6 +138,12 @@ export class Router {
         this.outlet = outlet;
     }
 
+    private notifyListeners(pathname: string) {
+        for (const listener of this.listeners) {
+            listener(pathname);
+        }
+    }
+
     private navigateTo(path: string, prerenderedPage?: HTMLElement) {
         const route = this.matchRoute(path);
         if (!route) {
@@ -178,12 +188,14 @@ export class Router {
             const route = this.matchRoute(location.pathname);
             if (!route) {
                 this.navigateTo("/404");
+                this.notifyListeners("/404");
                 return;
             }
             if ((route.route.requiresAuth && !this.authProvider()) || (!this.authProvider() && ev.state.page > 1)) {
                 this.popAll(this.rootRoute);
             } else {
                 this.navigateTo(location.pathname + location.search + location.hash);
+                this.notifyListeners(location.pathname);
             }
         } else {
             this.currPage = ev.state.page;
@@ -200,6 +212,7 @@ export class Router {
                 } else {
                     this.navigateTo(location.pathname);
                 }
+                this.notifyListeners(location.pathname);
             });
         }
     }

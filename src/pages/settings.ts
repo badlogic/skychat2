@@ -39,7 +39,7 @@ export class SettingsPage extends BaseElement {
 
         return html`<div class="${pageContainerStyle}">
             ${renderTopbar(i18n("Settings"))}
-            <div class="${pageContentStyle} px-4">
+            <div class="${pageContentStyle}">
                 ${user
                     ? html`<div class="px-4 h-12 flex items-center font-semibold">${i18n("Signed in as")}</div>
                           <div class="px-4 flex gap-4">
