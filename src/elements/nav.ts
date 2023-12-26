@@ -4,7 +4,7 @@ import { getScrollParent, dom, BaseElement } from "../app.js";
 import { bellIcon, cloudIcon, hashIcon, homeIcon, listIcon, searchIcon, settingsIcon } from "../utils/icons.js";
 import { Store } from "../utils/store.js";
 import { store } from "../appstate.js";
-import { defaultAvatar } from "./default-icons.js";
+import { defaultAvatar } from "../pages/default-icons.js";
 import { router } from "../utils/routing.js";
 
 @customElement("bottom-nav-bar")

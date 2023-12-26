@@ -44,6 +44,20 @@ export interface Messages {
     "You have a new notification": string;
     "New notification": string;
     "Not signed in": string;
+    Thread: string;
+    Profile: string;
+    "Profile does not exist": string;
+    "Copied link to clipboard": string;
+    "Follows you": string;
+    Joined: string;
+    followers: string;
+    following: string;
+    posts: string;
+    "You are muting the user.": string;
+    "User muted by moderation list ": (list: string) => string;
+    "You are blocked by the user.": string;
+    "You are blocking the user.": string;
+    "User blocked by moderation list ": (list: string) => string;
 }
 
 const english: Messages = {
@@ -94,6 +108,20 @@ const english: Messages = {
     "You have a new notification": "You have a new notification",
     "New notification": "New notification",
     "Not signed in": "Not signed in",
+    Thread: "Thread",
+    Profile: "Profile",
+    "Profile does not exist": "Profile does not exist",
+    "Copied link to clipboard": "Copied link to clipboard",
+    "Follows you": "Follows you",
+    Joined: "Joined",
+    followers: "followers",
+    following: "following",
+    posts: "posts",
+    "You are muting the user.": "You are muting the user.",
+    "User muted by moderation list ": (list: string) => "User muted by moderation list " + list,
+    "You are blocked by the user.": "You are blocked by the user.",
+    "You are blocking the user.": "You are blocking the user.",
+    "User blocked by moderation list ": (list: string) => "User blocked by moderation list " + list,
 };
 
 export type LanguageCode = "en";

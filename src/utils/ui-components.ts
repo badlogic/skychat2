@@ -188,6 +188,15 @@ export function isSafariBrowser(): boolean {
     return !userAgent.includes("chrome") && !userAgent.includes("android") && (userAgent.includes("webkit") || userAgent.includes("safari"));
 }
 
+export function renderInfo(content: TemplateResult | HTMLElement | string, icon?: TemplateResult, click?: (ev: MouseEvent) => void) {
+    return html`<div
+        @click=${(ev: MouseEvent) => (click ? click(ev) : undefined)}
+        class="bg-muted text-muted-fg fill-muted-fg, px-4 py-2 rounded flex items-center"
+    >
+        ${icon ? html`<i class="icon !w-6 !h-6 fill-muted-fg mr-2">${icon}</i>` : nothing}${content}
+    </div>`;
+}
+
 export function renderError(error: string) {
     return html`<div class="bg-red-500 w-full flex items-center px-4 py-2 text-[#fff] gap-2 rounded-md">
         <i class="icon !w-6 !h-6 fill-[#fff]">${errorIcon}</i>
@@ -647,7 +656,7 @@ export class Topbar extends BaseElement {
                     ${this.buttons}
                 </div>
             </div>
-            <div class="w-full h-10"></div>
+            <div class="w-full h-12"></div>
         `;
     }
 }

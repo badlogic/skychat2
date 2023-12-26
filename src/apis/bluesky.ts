@@ -316,6 +316,18 @@ export class BlueSky {
         }
     }
 
+    static async getProfileCreationDate(did: string): Promise<Error | Date> {
+        if (!BlueSky.client) return new Error("Not connected");
+        try {
+            const result = await fetch(`https://plc.directory/${did}/log/audit`);
+            if (!result.ok) throw new Error();
+            const log = ((await result.json()) as { createdAt?: string }[])[0];
+            return new Date(log.createdAt ?? new Date().toISOString());
+        } catch (e) {
+            return error("Couldn't load profile creation date", e);
+        }
+    }
+
     static async countUnreadNotifications(): Promise<Error | number> {
         if (!BlueSky.client) return new Error("Not connected");
         try {
@@ -356,6 +368,30 @@ export class BlueSky {
             return { cursor: listResponse.data.cursor, items: listResponse.data.notifications };
         } catch (e) {
             return error("Couldn't load notifications", e);
+        }
+    }
+
+    static async getActorLists(did: string, cursor?: string, limit = 20, notify = true): Promise<Error | StreamPage<ListView>> {
+        if (!BlueSky.client) return new Error("Not connected");
+        try {
+            const result = await BlueSky.client.app.bsky.graph.getLists({ actor: did, cursor, limit });
+            if (!result.success) throw new Error();
+            // FIXME notify
+            return { cursor: result.data.cursor, items: result.data.lists };
+        } catch (e) {
+            return error("Couldn't load actor lists", e);
+        }
+    }
+
+    static async getActorGenerators(did: string, cursor?: string, limit = 20, notify = true): Promise<Error | StreamPage<GeneratorView>> {
+        if (!BlueSky.client) return new Error("Not connected");
+        try {
+            const result = await BlueSky.client.app.bsky.feed.getActorFeeds({ actor: did, cursor, limit });
+            if (!result.success) throw new Error();
+            // FIXME notify
+            return { cursor: result.data.cursor, items: result.data.feeds };
+        } catch (e) {
+            return error("Couldn't load actor generators", e);
         }
     }
 }

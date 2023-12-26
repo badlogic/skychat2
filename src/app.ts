@@ -5,6 +5,7 @@ import { setupLiveReload } from "./utils/live-reload.js";
 import { renderError } from "./utils/ui-components.js";
 import { router } from "./utils/routing.js";
 export * from "./pages/index.js";
+export * from "./elements/index.js";
 export * from "./utils/ui-components.js";
 
 import "./appstate.js";
@@ -12,6 +13,7 @@ import { BlueSky } from "./apis/bluesky.js";
 import { store } from "./appstate.js";
 import { LoginPage } from "./pages/login.js";
 import { pageContainerStyle, pageContentStyle } from "./utils/styles.js";
+import { ProfilePage } from "./pages/profile.js";
 
 setupLiveReload();
 
@@ -53,6 +55,14 @@ export class App extends LitElement {
             true,
             (page) => true,
             false
+        );
+
+        router.addRoute<ProfilePage>(
+            "/profile/:id",
+            () => html`<profile-page></profile-page>`,
+            false,
+            (page: ProfilePage) => page.profile?.did == router.getCurrentParams()?.get("id"),
+            true
         );
 
         router.setRootRoute("/");

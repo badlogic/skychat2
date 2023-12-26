@@ -19,7 +19,7 @@ export class HomeTimelineStreamView extends StreamView<FeedViewPost> {
     }
 
     renderItem(item: FeedViewPost, polledItems: boolean): TemplateResult {
-        return html`<div>feed view post ${this.count++}</div>`;
+        return html`<feed-view-post .post=${item}></feed-view-post>`;
     }
 }
 

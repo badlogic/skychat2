@@ -149,6 +149,7 @@ export class Router {
     }
 
     private savePage(page: RouterPage) {
+        if (page.page.style.display == "none") return;
         page.srcollTop = getScrollParent(this.outlet)!.scrollTop;
         page.display = page.page.style.display;
         const streamViews = Array.from(page.page.querySelectorAll("*")).filter((el) => el instanceof StreamView) as StreamView<any>[];
