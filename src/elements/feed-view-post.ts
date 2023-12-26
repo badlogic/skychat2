@@ -25,11 +25,11 @@ export class FeedViewPostElement extends BaseElement {
               </div>`
             : nothing;
 
-        if (this.post.reply && AppBskyFeedDefs.isPostView(this.post.reply.parent)) {
+        if (!AppBskyFeedDefs.isReasonRepost(post.reason) && this.post.reply && AppBskyFeedDefs.isPostView(this.post.reply.parent)) {
             return html`<div class="flex flex-col">
                 ${repostedBy}
                 <post-view .post=${this.post.reply.parent}></post-view>
-                <post-view class="border-l border-primary ml-2 pl-2" .post=${this.post.post}></post-view>
+                <post-view class="border-l border-primary mt-2 ml-2 pl-4" .post=${this.post.post} .showReplyingTo=${false}></post-view>
             </div>`;
         }
 

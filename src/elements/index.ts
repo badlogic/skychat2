@@ -3,3 +3,4 @@ export * from "./feed-view-post.js";
 export * from "./post-view.js";
 export * from "./profile.js";
 export * from "./record.js";
+export * from "./time.js";

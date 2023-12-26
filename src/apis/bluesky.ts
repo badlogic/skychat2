@@ -222,6 +222,7 @@ export class BlueSky {
         feedViewPosts: FeedViewPost[]
     ): Promise<Error | { profiles: ProfileViewDetailed[]; numQuotes?: NumQuote[] }> {
         try {
+            const replyToProfiles: ProfileView[] = [];
             const profilesToFetch: string[] = [];
             const postUrisToFetch: string[] = [];
             for (const feedViewPost of feedViewPosts) {
@@ -231,6 +232,7 @@ export class BlueSky {
                 if (feedViewPost.reply) {
                     if (AppBskyFeedDefs.isPostView(feedViewPost.reply.parent)) {
                         postUrisToFetch.push(feedViewPost.reply.parent.uri);
+                        replyToProfiles.push(feedViewPost.reply.parent.author);
                         const parentRecord = record(feedViewPost.reply.parent);
                         if (parentRecord && parentRecord.reply) {
                             profilesToFetch.push(splitAtUri(parentRecord.reply.parent.uri).repo);
@@ -243,7 +245,7 @@ export class BlueSky {
             }
             const promises = await Promise.all([BlueSky.getProfiles(profilesToFetch), BlueSky.getNumQuotes(postUrisToFetch)]);
             if (promises[0] instanceof Error) throw promises[0];
-            return { profiles: promises[0], numQuotes: promises[1] instanceof Error ? undefined : promises[1] };
+            return { profiles: [...promises[0], ...replyToProfiles], numQuotes: promises[1] instanceof Error ? undefined : promises[1] };
         } catch (e) {
             return error("Couldn't fetch feed view post dependencies");
         }

@@ -114,3 +114,7 @@ export function unescapeHtml(html: string): string {
     const doc = new DOMParser().parseFromString(html, "text/html");
     return doc.documentElement.textContent || "";
 }
+
+export function clone<T>(value: T): T {
+    return JSON.parse(JSON.stringify(value));
+}

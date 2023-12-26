@@ -45,6 +45,11 @@ export type StateConfig = {
     post: PostView;
     profile: ProfileView;
     numQuotes: NumQuote;
+    tick: number;
 };
 
 export const state = new State<StateConfig>();
+state.poll(async () => {
+    state.update("tick", performance.now());
+    return true;
+}, 1000 * 60);

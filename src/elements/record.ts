@@ -24,9 +24,9 @@ export function renderRichText(record: AppBskyFeedPost.Record | RichText) {
         if (segment.isMention()) {
             segments.push(html`<a class="text-primary" href="/profile/${segment.mention?.did}">${segment.text}</a>`);
         } else if (segment.isLink()) {
-            segments.push(html`<a href="${segment.link?.uri}" target="_blank" class="break-all">${segment.text}</a>`);
+            segments.push(html`<a href="${segment.link?.uri}" target="_blank" class="text-blue-500 break-all">${segment.text}</a>`);
         } else if (segment.isTag()) {
-            segments.push(html`<a href="/hashtag/${encodeURIComponent(segment.text)}">${segment.text}</a>`);
+            segments.push(html`<a href="/hashtag/${encodeURIComponent(segment.text)}" class="text-blue-500">${segment.text}</a>`);
         } else {
             segments.push(html`<span>${segment.text}</span>`);
         }
@@ -40,13 +40,16 @@ export class RecordElement extends BaseElement {
     @property()
     record?: AppBskyFeedPost.Record;
 
+    @property()
+    showReplyingTo = true;
+
     render() {
         if (!this.record) return html`${nothing}`;
 
         const record = this.record;
 
         const replyToAuthorDid = record.reply ? splitAtUri(record.reply?.parent.uri).repo : undefined;
-        const replyToProfile = replyToAuthorDid ? state.get("profile", replyToAuthorDid) : undefined;
+        const replyToProfile = replyToAuthorDid && this.showReplyingTo ? state.get("profile", replyToAuthorDid) : undefined;
 
         return html`<div class="flex flex-col gap-2">
             ${replyToProfile

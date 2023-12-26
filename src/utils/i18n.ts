@@ -65,6 +65,7 @@ export interface Messages {
     Lists: string;
     "Nothing to show": string;
     "Replying to": string;
+    "Deleted post": string;
 }
 
 const english: Messages = {
@@ -136,6 +137,7 @@ const english: Messages = {
     Lists: "Lists",
     "Nothing to show": "Nothing to show",
     "Replying to": "Replying to",
+    "Deleted post": "Deleted post",
 };
 
 export type LanguageCode = "en";

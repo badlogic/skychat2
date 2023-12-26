@@ -47,7 +47,7 @@ export class SettingsPage extends BaseElement {
                 ${user
                     ? html`<div class="px-4 h-12 flex items-center font-semibold">${i18n("Signed in as")}</div>
                           <div class="px-4 flex gap-4">
-                              ${this.renderProfile(user.profile)}
+                              <profile-avatar-name .profile=${user.profile}></profile-avatar-name>
                               <button class="btn ml-auto" @click=${this.logout}>${i18n("Sign out")}</button>
                           </div>`
                     : nothing}
