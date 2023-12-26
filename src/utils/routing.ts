@@ -7,18 +7,12 @@ export class Route<T extends HTMLElement> {
     readonly regexp: RegExp;
     readonly keys: Key[] = [];
 
-    constructor(
-        readonly path: string,
-        readonly renderPage: () => TemplateResult | T,
-        readonly requiresAuth = false,
-        readonly reusePage: (page: T) => boolean = () => true,
-        readonly removePage = true
-    ) {
+    constructor(readonly path: string, readonly renderPage: () => TemplateResult | T, readonly requiresAuth = false, readonly removePage = true) {
         this.regexp = pathToRegexp(this.path, this.keys);
     }
 }
 
-export type RouterPage = { route: Route<any>; page: HTMLElement; srcollTop: number; display: string };
+export type RouterPage = { route: Route<any>; path: string; page: HTMLElement; srcollTop: number; display: string };
 
 export class Router {
     pageStack: RouterPage[] = [];
@@ -50,14 +44,8 @@ export class Router {
         this.notFoundRoot = path;
     }
 
-    addRoute<T extends HTMLElement>(
-        path: string,
-        renderPage: () => TemplateResult | T,
-        requiresAuth: boolean = false,
-        reusePage: (page: T) => boolean = () => true,
-        removePage = true
-    ) {
-        const route = new Route(path, renderPage, requiresAuth, reusePage, removePage);
+    addRoute<T extends HTMLElement>(path: string, renderPage: () => TemplateResult | T, requiresAuth: boolean = false, removePage = true) {
+        const route = new Route(path, renderPage, requiresAuth, removePage);
         if (this.routes.some((other) => other.path == route.path)) throw new Error(`Route ${route.path}} already defined`);
         this.routes.push(route);
     }
@@ -178,14 +166,14 @@ export class Router {
         }
 
         if (this.top()) this.savePage(this.top()!);
-        const matchingPage = this.pageStack.find((page) => page.route == route.route);
+        const matchingPage = this.pageStack.find((page) => page.path == path);
         if (matchingPage) {
             this.restorePage(matchingPage);
         } else {
             const page = route.route.renderPage();
             const pageDom = page instanceof HTMLElement ? page : dom(page)[0];
             getScrollParent(this.outlet)!.scrollTop = 0;
-            this.pageStack.push({ route: route.route, page: pageDom, srcollTop: 0, display: pageDom.style.display });
+            this.pageStack.push({ route: route.route, path, page: pageDom, srcollTop: 0, display: pageDom.style.display });
             this.outlet.append(pageDom);
         }
         return true;
