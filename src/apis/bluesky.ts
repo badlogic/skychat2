@@ -92,21 +92,21 @@ export function getBskyListUrl(list: ListView) {
 
 export function getSkychatPostUrl(post: PostView) {
     const atUri = splitAtUri(post.uri);
-    return location.protocol + "//" + location.host + `/#thread/${atUri.repo}/${atUri.rkey}`;
+    return location.protocol + "//" + location.host + `/thread/${atUri.repo}/${atUri.rkey}`;
 }
 
 export function getSkychatGeneratorUrl(generator: GeneratorView) {
     const atUri = splitAtUri(generator.uri);
-    return location.protocol + "//" + location.host + `/#feed/${atUri.repo}/${atUri.rkey}`;
+    return location.protocol + "//" + location.host + `/feed/${atUri.repo}/${atUri.rkey}`;
 }
 
 export function getSkychatListUrl(list: ListView) {
     const atUri = splitAtUri(list.uri);
-    return location.protocol + "//" + location.host + `/#list/${atUri.repo}/${atUri.rkey}`;
+    return location.protocol + "//" + location.host + `/list/${atUri.repo}/${atUri.rkey}`;
 }
 
 export function getSkychatProfileUrl(profile: ProfileView) {
-    return location.protocol + "//" + location.host + `/#profile/${profile.did}`;
+    return location.protocol + "//" + location.host + `/profile/${profile.did}`;
 }
 
 export class BlueSky {

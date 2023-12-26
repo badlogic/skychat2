@@ -75,7 +75,7 @@ const english: Messages = {
     "Sorry, an unknown error occured": "Sorry, an unknown error occured",
     "End of list": "End of list",
     footer: `Skychat is lovingly made by
-        <a href="https://skychat.social/#profile/badlogic.bsky.social" target="_blank">Mario Zechner</a><br />
+        <a href="https://skychat.social/profile/badlogic.bsky.social" target="_blank">Mario Zechner</a><br />
         <a href="https://github.com/badlogic/skychat2" target="_blank">Source code</a>`,
     Username: "Username",
     "App password": "App password",
