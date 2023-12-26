@@ -91,6 +91,9 @@ export abstract class Stream<T> {
             for (const item of response.items) {
                 this.itemsMap.set(this.getItemKey(item), item);
             }
+            if (response.items.length > 0) {
+                await this.loadDependencies(response.items);
+            }
             if (!response.cursor && response.items.length > 0) this.close();
             const page = { cursor: response.cursor, items: response.items };
             if (page.items.length > 0) this.pages.push(page);

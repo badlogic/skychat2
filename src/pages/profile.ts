@@ -1,10 +1,10 @@
 import { html, nothing } from "lit";
-import { BaseElement, closeButton, copyTextToClipboard, renderError, renderInfo, renderRichText, renderTopbar, toast } from "../app.js";
-import { customElement, property } from "lit/decorators.js";
+import { BaseElement, closeButton, copyTextToClipboard, dom, renderError, renderInfo, renderRichText, renderTopbar, toast } from "../app.js";
+import { customElement, property, state } from "lit/decorators.js";
 import { pageContainerStyle, pageContentStyle } from "../utils/styles.js";
 import { i18n } from "../utils/i18n.js";
 import { ProfileViewDetailed } from "@atproto/api/dist/client/types/app/bsky/actor/defs.js";
-import { BlueSky, getSkychatProfileUrl } from "../apis/bluesky.js";
+import { ActorFeedType, BlueSky, FeedViewPostStream, PostViewStream, getSkychatProfileUrl } from "../apis/bluesky.js";
 import { router } from "../utils/routing.js";
 import { store } from "../appstate.js";
 import { defaultAvatar } from "./default-icons.js";
@@ -25,6 +25,9 @@ export class ProfilePage extends BaseElement {
 
     @property()
     error?: string;
+
+    @state()
+    filter: ActorFeedType | "likes" | "generators" | "lists" = "posts_no_replies";
 
     hasGenerators = false;
     hasLists = false;
@@ -80,6 +83,70 @@ export class ProfilePage extends BaseElement {
         const user = store.get("user");
         const rt = new RichText({ text: this.profile.description ?? "" });
         rt.detectFacetsWithoutResolution();
+
+        let feed: HTMLElement;
+        if (this.profile.viewer?.blockedBy || this.profile.viewer?.blocking || this.profile.viewer?.blockingByList) {
+            feed = dom(html`<div class="p-4 text-center">${i18n("Nothing to show")}</div>`)[0];
+        } else {
+            switch (this.filter) {
+                case "posts_with_replies":
+                case "posts_no_replies":
+                case "posts_with_media":
+                    feed = dom(
+                        html`<feed-view-post-stream
+                            .stream=${new FeedViewPostStream((cursor?: string) => BlueSky.getActorFeed(this.filter as ActorFeedType, profile.did))}
+                        ></feed-view-post-stream>`
+                    )[0];
+                    break;
+                case "likes":
+                    if (this.profile.did == user?.profile.did) {
+                        feed = dom(
+                            html`<feed-view-post-stream
+                                .stream=${new FeedViewPostStream((cursor?: string) => BlueSky.getLoggedInActorLikes(cursor))}
+                            ></feed-view-post-stream>`
+                        )[0];
+                    } else {
+                        feed = dom(
+                            html`<post-view-stream
+                                .stream=${new PostViewStream((cursor?: string) => BlueSky.getActorLikes(this.profile!.did, cursor))}
+                            ></post-view-stream>`
+                        )[0];
+                    }
+                    break;
+                // FIXME
+                /*case "generators":
+                    const generatorAction = (action: GeneratorViewElementAction, generator: GeneratorView) => {
+                        if (action == "clicked") {
+                            document.body.append(dom(html`<feed-overlay .feedUri=${generator.uri}></feed-overlay>`)[0]);
+                        }
+                    };
+                    feed = dom(
+                        html`<generators-stream-view
+                            .minimal=${false}
+                            .stream=${new ActorGeneratorsStream(this.profile.did)}
+                            .action=${(action: GeneratorViewElementAction, generator: GeneratorView) => generatorAction(action, generator)}
+                        ></generators-stream-view>`
+                    )[0];
+                    break;
+                case "lists":
+                    const listAction = (action: ListViewElementAction, list: ListView) => {
+                        if (action == "clicked") {
+                            document.body.append(dom(html`<list-overlay .listUri=${list.uri}></list-overlay>`)[0]);
+                        }
+                    };
+                    feed = dom(
+                        html`<lists-stream-view
+                            .minimal=${false}
+                            .stream=${new ActorListsStream(this.profile.did)}
+                            .action=${(action: ListViewElementAction, list: ListView) => listAction(action, list)}
+                        ></lists-stream-view>`
+                    )[0];
+                    break;*/
+                default:
+                    feed = dom(html`<div class="p-4 text-center">${i18n("Nothing to show")}</div>`)[0];
+            }
+        }
+
         const openGallery = (ev: Event, imageUrl: string) => {
             // FIXME
         };
@@ -187,6 +254,59 @@ export class ProfilePage extends BaseElement {
                         ? renderInfo(i18n("User blocked by moderation list ")(this.profile.viewer.blockingByList.name), html`${shieldIcon}`)
                         : nothing}
                 </div>
+                <div class="overflow-x-auto flex flex-nowrap border-b border-divider">
+                    <button
+                        class="whitespace-nowrap ${this.filter == "posts_no_replies"
+                            ? "border-b-2 border-primary font-semibold"
+                            : "text-muted-fg"} px-2 h-10"
+                        @click=${() => (this.filter = "posts_no_replies")}
+                    >
+                        ${i18n("Posts")}
+                    </button>
+                    <button
+                        class="whitespace-nowrap ${this.filter == "posts_with_replies"
+                            ? "border-b-2 border-primary font-semibold"
+                            : "text-muted-fg"} px-2 h-10"
+                        @click=${() => (this.filter = "posts_with_replies")}
+                    >
+                        ${i18n("Posts & Replies")}
+                    </button>
+                    <button
+                        class="whitespace-nowrap ${this.filter == "posts_with_media"
+                            ? "border-b-2 border-primary font-semibold"
+                            : "text-muted-fg"} px-2 h-10"
+                        @click=${() => (this.filter = "posts_with_media")}
+                    >
+                        ${i18n("Media")}
+                    </button>
+                    <button
+                        class="whitespace-nowrap ${this.filter == "likes" ? "border-b-2 border-primary font-semibold" : "text-muted-fg"} px-2 h-10"
+                        @click=${() => (this.filter = "likes")}
+                    >
+                        ${i18n("Likes")}
+                    </button>
+                    ${this.hasGenerators
+                        ? html`<button
+                              class="whitespace-nowrap ${this.filter == "generators"
+                                  ? "border-b-2 border-primary font-semibold"
+                                  : "text-muted-fg"} px-2 h-10"
+                              @click=${() => (this.filter = "generators")}
+                          >
+                              ${i18n("Feeds")}
+                          </button>`
+                        : nothing}
+                    ${this.hasLists
+                        ? html` <button
+                              class="whitespace-nowrap ${this.filter == "lists"
+                                  ? "border-b-2 border-primary font-semibold"
+                                  : "text-muted-fg"} px-2 h-10"
+                              @click=${() => (this.filter = "lists")}
+                          >
+                              ${i18n("Lists")}
+                          </button>`
+                        : nothing}
+                </div>
+                <div class="min-h-screen">${feed}</div>
             </div>
         </div>`;
     }

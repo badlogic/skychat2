@@ -9,7 +9,7 @@ function apiBaseUrl() {
     return location.href.includes("localhost") || location.href.includes("192.168.1") ? `http://${location.hostname}:3333/api/` : "/api/";
 }
 
-export async function apiGet<T>(endpoint: string) {
+export async function apiGet<T>(endpoint: string): Promise<T | Error> {
     try {
         const result = await fetch(apiBaseUrl() + endpoint);
         if (!result.ok) throw new Error();
@@ -19,7 +19,7 @@ export async function apiGet<T>(endpoint: string) {
     }
 }
 
-export async function apiPost<T>(endpoint: string, params: URLSearchParams | FormData) {
+export async function apiPost<T>(endpoint: string, params: URLSearchParams | FormData): Promise<T | Error> {
     let headers: HeadersInit = {};
     let body: string | FormData;
 
@@ -69,5 +69,9 @@ export class Api {
 
     static async numQuotes(uris: string[]) {
         return apiGet<Record<string, number>>("numquotes?" + uris.map((uri) => `uri=${encodeURIComponent(uri)}&`).join(""));
+    }
+
+    static async resolveDidWeb(did: string) {
+        return apiGet<any>(`resolve-did-web?did=${encodeURIComponent(did)}`);
     }
 }

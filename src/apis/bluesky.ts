@@ -1,6 +1,6 @@
 import { AppBskyFeedDefs, AppBskyFeedPost, AppBskyNotificationListNotifications, AtpSessionData, AtpSessionEvent, BskyAgent } from "@atproto/api";
 import { FeedViewPost, GeneratorView, PostView } from "@atproto/api/dist/client/types/app/bsky/feed/defs.js";
-import { store } from "../appstate.js";
+import { state, store } from "../appstate.js";
 import { Stream, StreamPage } from "../utils/streams.js";
 import { error } from "../utils/utils.js";
 import { ProfileView, ProfileViewDetailed } from "@atproto/api/dist/client/types/app/bsky/actor/defs.js";
@@ -21,6 +21,8 @@ export type LinkCard = {
     description: string;
     image: string;
 };
+
+export type ActorFeedType = "home" | "posts_with_replies" | "posts_no_replies" | "posts_with_media";
 
 export async function extractLinkCard(url: string): Promise<LinkCard | Error> {
     try {
@@ -220,17 +222,14 @@ export class BlueSky {
         feedViewPosts: FeedViewPost[]
     ): Promise<Error | { profiles: ProfileViewDetailed[]; numQuotes?: NumQuote[] }> {
         try {
-            const posts: PostView[] = [];
             const profilesToFetch: string[] = [];
             const postUrisToFetch: string[] = [];
             for (const feedViewPost of feedViewPosts) {
-                posts.push(feedViewPost.post);
                 postUrisToFetch.push(feedViewPost.post.uri);
                 profilesToFetch.push(feedViewPost.post.author.did);
 
                 if (feedViewPost.reply) {
                     if (AppBskyFeedDefs.isPostView(feedViewPost.reply.parent)) {
-                        posts.push(feedViewPost.reply.parent);
                         postUrisToFetch.push(feedViewPost.reply.parent.uri);
                         const parentRecord = record(feedViewPost.reply.parent);
                         if (parentRecord && parentRecord.reply) {
@@ -282,7 +281,6 @@ export class BlueSky {
         try {
             const response = await BlueSky.client.getTimeline({ cursor });
             if (!response.success) throw new Error();
-            await BlueSky.loadFeedViewPostsDependencies(response.data.feed);
             return { cursor: response.data.cursor, items: response.data.feed };
         } catch (e) {
             return error("Could not get home timeline", e);
@@ -371,7 +369,7 @@ export class BlueSky {
         }
     }
 
-    static async getActorLists(did: string, cursor?: string, limit = 20, notify = true): Promise<Error | StreamPage<ListView>> {
+    static async getActorLists(did: string, cursor?: string, limit = 20): Promise<Error | StreamPage<ListView>> {
         if (!BlueSky.client) return new Error("Not connected");
         try {
             const result = await BlueSky.client.app.bsky.graph.getLists({ actor: did, cursor, limit });
@@ -383,7 +381,7 @@ export class BlueSky {
         }
     }
 
-    static async getActorGenerators(did: string, cursor?: string, limit = 20, notify = true): Promise<Error | StreamPage<GeneratorView>> {
+    static async getActorGenerators(did: string, cursor?: string, limit = 20): Promise<Error | StreamPage<GeneratorView>> {
         if (!BlueSky.client) return new Error("Not connected");
         try {
             const result = await BlueSky.client.app.bsky.feed.getActorFeeds({ actor: did, cursor, limit });
@@ -394,12 +392,110 @@ export class BlueSky {
             return error("Couldn't load actor generators", e);
         }
     }
+
+    static async getActorFeed(type: ActorFeedType, actor?: string, cursor?: string, limit = 20): Promise<Error | StreamPage<FeedViewPost>> {
+        if (!BlueSky.client) return new Error("Not connected");
+        try {
+            let data: StreamPage<FeedViewPost> | undefined;
+
+            if (!actor) throw new Error("No actor given");
+            const response = await BlueSky.client.getAuthorFeed({ actor, cursor, filter: type, limit });
+            if (!response.success) throw new Error();
+            data = { cursor: response.data.cursor, items: response.data.feed };
+
+            // FIXME notify
+            return data;
+        } catch (e) {
+            return error("Couldn't load actor feed", e);
+        }
+    }
+
+    static async getLoggedInActorLikes(cursor?: string): Promise<Error | StreamPage<FeedViewPost>> {
+        if (!BlueSky.client) return new Error("Not connected");
+        try {
+            const did = store.get("user")?.profile.did;
+            if (!did) throw new Error("Not connected");
+            const result = await BlueSky.client.app.bsky.feed.getActorLikes({ cursor, actor: did });
+            if (!result.success) return new Error();
+            const posts: PostView[] = [];
+            for (const feedViewPost of result.data.feed) {
+                posts.push(feedViewPost.post);
+                if (feedViewPost.reply) {
+                    if (AppBskyFeedDefs.isPostView(feedViewPost.reply.parent)) {
+                        posts.push(feedViewPost.reply.parent);
+                    }
+                }
+            }
+            // FIXME notify
+            return { cursor: result.data.cursor, items: result.data.feed };
+        } catch (e) {
+            return error("Couldn't load logged in actor likes", e);
+        }
+    }
+
+    static async getActorLikes(did: string, cursor?: string, limit = 20): Promise<Error | StreamPage<PostView>> {
+        if (!BlueSky.client) return new Error("Not connected");
+        try {
+            // Resolve the didDoc
+            let repoResult: Response | (any | Error);
+            repoResult = did.includes("did:plc")
+                ? await fetch("https://plc.directory/" + did)
+                : await Api.resolveDidWeb(`api/resolve-did-web?did=${encodeURIComponent(did)}`);
+            if (!repoResult.ok) throw new Error("Couldn't get didDoc");
+            if (repoResult instanceof Error) throw repoResult;
+
+            // Resolve the service
+            const didDoc: any = await repoResult.json();
+            if (!didDoc.service) throw new Error("Service not defined for did");
+            let pdsUrl: string | undefined;
+            for (const service of didDoc.service) {
+                if (service.type == "AtprotoPersonalDataServer") {
+                    pdsUrl = service.serviceEndpoint;
+                }
+            }
+            if (!pdsUrl) throw new Error("PDS not found");
+
+            // List the records from the likes collection
+            const client = new BskyAgent({ service: pdsUrl });
+            const result = await client.com.atproto.repo.listRecords({ cursor, limit, repo: did, collection: "app.bsky.feed.like" });
+            if (!result.success) throw new Error("Couldn't list records");
+
+            // Collect the uris and load the posts
+            const postUris: string[] = [];
+            for (const record of result.data.records) {
+                postUris.push((record.value as any).subject.uri);
+            }
+            if (postUris.length == 0) return { items: [] as PostView[] };
+
+            const postsResult = await BlueSky.getPosts(postUris);
+            if (postsResult instanceof Error) throw postsResult;
+            return { cursor: result.data.cursor, items: postsResult.filter((post) => post != undefined) };
+        } catch (e) {
+            return error("Couldn't load actor likes", e);
+        }
+    }
 }
 
 export class FeedViewPostStream extends Stream<FeedViewPost> {
     async loadDependencies(newItems: FeedViewPost[]): Promise<Error | void> {
+        for (const item of newItems) {
+            state.update("post", item.post, item.post.uri);
+            state.update("profile", item.post.author, item.post.author.did);
+            if (item.reply && AppBskyFeedDefs.isPostView(item.reply.parent)) {
+                state.update("post", item.reply.parent, item.reply.parent.uri);
+            }
+        }
+
         const response = await BlueSky.loadFeedViewPostsDependencies(newItems);
         if (response instanceof Error) return response;
+        if (response.numQuotes) {
+            for (const numQuote of response.numQuotes) {
+                state.update("numQuotes", numQuote, numQuote.postUri);
+            }
+        }
+        for (const profile of response.profiles) {
+            state.update("profile", profile, profile.did);
+        }
     }
 
     getItemKey(item: FeedViewPost): string {
@@ -407,6 +503,22 @@ export class FeedViewPostStream extends Stream<FeedViewPost> {
     }
 
     getItemDate(item: FeedViewPost): Date {
+        return date(item) ?? new Date();
+    }
+}
+
+export class PostViewStream extends Stream<PostView> {
+    async loadDependencies(newItems: AppBskyFeedDefs.PostView[]): Promise<void | Error> {
+        for (const item of newItems) {
+            state.update("post", item, item.uri);
+            state.update("profile", item.author, item.author.did);
+        }
+    }
+
+    getItemKey(item: AppBskyFeedDefs.PostView): string {
+        return item.uri;
+    }
+    getItemDate(item: AppBskyFeedDefs.PostView): Date {
         return date(item) ?? new Date();
     }
 }

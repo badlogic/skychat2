@@ -61,7 +61,7 @@
     }
 
     a {
-        @apply text-blue-500 break-words hover:underline;
+        @apply break-words hover:underline;
     }
 
     iframe {
@@ -106,6 +106,10 @@
 
     .textfield {
         @apply px-2 py-1 bg-transparent dark:text-white border border-divider rounded-md focus:border-primary focus:outline-none;
+    }
+
+    record-view a {
+        @apply text-blue-500;
     }
 }
 

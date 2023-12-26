@@ -2,26 +2,12 @@ import { FeedViewPost } from "@atproto/api/dist/client/types/app/bsky/feed/defs.
 import { TemplateResult, html } from "lit";
 import { customElement } from "lit/decorators.js";
 import { BlueSky, FeedViewPostStream } from "../apis/bluesky.js";
-import { BaseElement, renderError, renderTopbar } from "../app.js";
+import { BaseElement, FeedViewPostStreamView, renderError, renderTopbar } from "../app.js";
 import { StreamView } from "../utils/streamviews.js";
 import { pageContainerStyle, pageContentStyle } from "../utils/styles.js";
 import { i18n } from "../utils/i18n.js";
 import { store } from "../appstate.js";
 import { settingsIcon } from "../utils/icons.js";
-
-@customElement("home-timeline")
-export class HomeTimelineStreamView extends StreamView<FeedViewPost> {
-    count = 0;
-    constructor() {
-        super();
-        const provider = async (cursor?: string) => BlueSky.getHomeTimeline(cursor);
-        this.stream = new FeedViewPostStream(provider, true, 5000);
-    }
-
-    renderItem(item: FeedViewPost, polledItems: boolean): TemplateResult {
-        return html`<feed-view-post .post=${item}></feed-view-post>`;
-    }
-}
 
 @customElement("home-page")
 export class HomePage extends BaseElement {
@@ -42,7 +28,9 @@ export class HomePage extends BaseElement {
         return html`<div class="${pageContainerStyle}">
             <div class="${pageContentStyle}">
                 ${renderTopbar(i18n("Home"), undefined, homeButtons)}
-                <home-timeline></home-timeline>
+                <feed-view-post-stream
+                    .stream=${new FeedViewPostStream(async (cursor?: string) => BlueSky.getHomeTimeline(cursor), true)}
+                ></feed-view-post-stream>
             </div>
         </div>`;
     }

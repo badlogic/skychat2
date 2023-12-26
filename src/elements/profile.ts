@@ -4,26 +4,7 @@ import { html, nothing } from "lit";
 import { defaultAvatar } from "../pages/default-icons.js";
 import { ProfileView } from "@atproto/api/dist/client/types/app/bsky/actor/defs.js";
 
-export function renderProfileAvatar(profile: ProfileView, smallAvatar = false) {
-    return html`${profile.avatar
-        ? html`<img loading="lazy" class="${smallAvatar ? "w-4 h-4" : "w-8 h-8 fancy-shadow"} rounded-full" src="${profile.avatar}" />`
-        : defaultAvatar}`;
-}
-
-export function renderProfileNameAndHandle(profile: ProfileView, smallAvatar = false) {
-    return html`<div class="flex flex-col">
-        <span class="${smallAvatar ? "text-sm" : ""} font-semibold line-clamp-1 text-black dark:text-white hover:underline"
-            >${profile.displayName ?? profile.handle}</span
-        >
-        ${profile.displayName && !smallAvatar ? html`<span class="text-xs text-muted-fg hover:underline">${profile.handle}</span>` : nothing}
-    </div>`;
-}
-
-export function renderProfile(profile: ProfileView, smallAvatar = false) {
-    return html`<a class="flex items-center gap-2 hover:no-underline" href="/profile/${profile.did}">
-        ${renderProfileAvatar(profile, smallAvatar)} ${renderProfileNameAndHandle(profile, smallAvatar)}
-    </a>`;
-}
+export type ProfileAvatarNameSize = "normal" | "small" | "tiny";
 
 @customElement("profile-avatar-name")
 export class ProfileAvatarNameElement extends BaseElement {
@@ -31,10 +12,35 @@ export class ProfileAvatarNameElement extends BaseElement {
     profile?: ProfileView;
 
     @property()
-    small = false;
+    size: ProfileAvatarNameSize = "normal";
 
     render() {
         if (!this.profile) return html`${nothing}`;
-        return html` <div class="flex flex-col">${renderProfile(this.profile, this.small)}</div> `;
+        const profile = this.profile;
+
+        switch (this.size) {
+            case "normal":
+                return html`
+                    <a class="flex items-center gap-2 hover:no-underline" href="/profile/${profile.did}">
+                        ${profile.avatar
+                            ? html`<img loading="lazy" class="w-8 h-8 fancy-shadow rounded-full" src="${profile.avatar}" />`
+                            : defaultAvatar}
+                        <div class="flex flex-col">
+                            <span class="font-semibold line-clamp-1 hover:underline">${profile.displayName ?? profile.handle}</span>
+                            ${profile.displayName ? html`<span class="text-xs text-muted-fg hover:underline">${profile.handle}</span>` : nothing}
+                        </div>
+                    </a>
+                `;
+            case "small":
+            case "tiny":
+                return html`
+                    <a class="flex items-center gap-2 hover:no-underline" href="/profile/${profile.did}">
+                        ${profile.avatar
+                            ? html`<img loading="lazy" class="w-4 h-4 fancy-shadow rounded-full" src="${profile.avatar}" />`
+                            : defaultAvatar}
+                        <span class="text-xs text-muted-fg line-clamp-1 hover:underline">${profile.displayName ?? profile.handle}</span>
+                    </a>
+                `;
+        }
     }
 }

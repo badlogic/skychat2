@@ -58,6 +58,13 @@ export interface Messages {
     "You are blocked by the user.": string;
     "You are blocking the user.": string;
     "User blocked by moderation list ": (list: string) => string;
+    Posts: string;
+    "Posts & Replies": string;
+    Media: string;
+    Feeds: string;
+    Lists: string;
+    "Nothing to show": string;
+    "Replying to": string;
 }
 
 const english: Messages = {
@@ -122,6 +129,13 @@ const english: Messages = {
     "You are blocked by the user.": "You are blocked by the user.",
     "You are blocking the user.": "You are blocking the user.",
     "User blocked by moderation list ": (list: string) => "User blocked by moderation list " + list,
+    Posts: "Posts",
+    "Posts & Replies": "Posts & Replies",
+    Media: "Media",
+    Feeds: "Feeds",
+    Lists: "Lists",
+    "Nothing to show": "Nothing to show",
+    "Replying to": "Replying to",
 };
 
 export type LanguageCode = "en";
