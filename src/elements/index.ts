@@ -4,3 +4,5 @@ export * from "./post-view.js";
 export * from "./profile.js";
 export * from "./record.js";
 export * from "./time.js";
+export * from "./embeds.js";
+export * from "./image-gallery.js";

@@ -1,12 +1,13 @@
 import { TemplateResult, html, nothing } from "lit";
 import { BaseElement, dom } from "../app.js";
 import { customElement, property } from "lit/decorators.js";
-import { AppBskyFeedPost, RichText } from "@atproto/api";
+import { AppBskyEmbedExternal, AppBskyEmbedImages, AppBskyEmbedRecord, AppBskyEmbedRecordWithMedia, AppBskyFeedPost, RichText } from "@atproto/api";
 import { map } from "lit/directives/map.js";
 import { splitAtUri } from "../common.js";
 import { state } from "../appstate.js";
 import { replyIcon } from "../utils/icons.js";
 import { i18n } from "../utils/i18n.js";
+import { ViewImage } from "@atproto/api/dist/client/types/app/bsky/embed/images.js";
 
 export function renderRichText(record: AppBskyFeedPost.Record | RichText) {
     if (!record.facets) {
@@ -47,7 +48,6 @@ export class RecordElement extends BaseElement {
         if (!this.record) return html`${nothing}`;
 
         const record = this.record;
-
         const replyToAuthorDid = record.reply ? splitAtUri(record.reply?.parent.uri).repo : undefined;
         const replyToProfile = replyToAuthorDid && this.showReplyingTo ? state.get("profile", replyToAuthorDid) : undefined;
 

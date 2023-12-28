@@ -8,6 +8,7 @@ import { heartFilledIcon, heartIcon, quoteIcon, reblogIcon, replyIcon } from "..
 import { state } from "../appstate.js";
 import { clone, error } from "../utils/utils.js";
 import { i18n } from "../utils/i18n.js";
+import { AppBskyEmbedExternal, AppBskyEmbedImages, AppBskyEmbedRecord, AppBskyEmbedRecordWithMedia } from "@atproto/api";
 
 @customElement("post-view-buttons")
 export class PostViewButtons extends BaseElement {
@@ -134,6 +135,8 @@ export class PostViewElement extends SubscribedElement {
         if (!this.post) return renderInfo(i18n("Deleted post"));
 
         const rec = record(this.post);
+        const embed = this.post.embed;
+
         return html`<div class="flex flex-col">
             <div class="flex items-center">
                 <profile-avatar-name .profile=${this.post.author}></profile-avatar-name>
@@ -143,6 +146,7 @@ export class PostViewElement extends SubscribedElement {
                 ></time-view>
             </div>
             <record-view class="mt-1" .record=${rec} .showReplyingTo=${this.showReplyingTo}></record-view>
+            ${embed ? html`<embed-view class="mt-1" .embed=${embed}></embed-view>` : nothing}
             <post-view-buttons class="-mb-2" .post=${this.post}></post-view-buttons>
         </div>`;
     }

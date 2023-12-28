@@ -1,3 +1,5 @@
+@import "photoswipe/dist/photoswipe.css";
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -106,6 +108,18 @@
 
     .textfield {
         @apply px-2 py-1 bg-transparent dark:text-white border border-divider rounded-md focus:border-primary focus:outline-none;
+    }
+
+    .pswp__button--zoom,
+    .pswp__button--close {
+        display: none !important;
+    }
+
+    .pswp__top-bar {
+        top: auto !important;
+        bottom: 0 !important;
+        justify-content: flex-start !important;
+        height: auto !important;
     }
 }
 

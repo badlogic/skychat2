@@ -118,3 +118,43 @@ export function unescapeHtml(html: string): string {
 export function clone<T>(value: T): T {
     return JSON.parse(JSON.stringify(value));
 }
+
+export async function getVideoDimensions(url: string): Promise<{ width: number; height: number } | Error> {
+    try {
+        return await new Promise((resolve, reject) => {
+            const video = document.createElement("video");
+
+            video.addEventListener("loadedmetadata", function () {
+                const result = { width: video.videoWidth, height: video.videoHeight };
+                video.pause();
+                video.src = "";
+                video.load();
+                resolve(result);
+            });
+
+            video.addEventListener("error", function () {
+                reject("Error loading video");
+            });
+
+            video.src = url;
+        });
+    } catch (e) {
+        return error("Couldn't load video", e);
+    }
+}
+
+export function enableYoutubeJSApi(originalString: string) {
+    const srcIndex = originalString.indexOf('src="');
+
+    if (srcIndex !== -1) {
+        const closingQuoteIndex = originalString.indexOf('"', srcIndex + 5);
+
+        if (closingQuoteIndex !== -1) {
+            const srcValue = originalString.substring(srcIndex + 5, closingQuoteIndex);
+            const updatedSrcValue = `${srcValue}&enablejsapi=1`;
+            const updatedString = originalString.replace(srcValue, updatedSrcValue);
+            return updatedString.replace("web-share", "");
+        }
+    }
+    return originalString;
+}

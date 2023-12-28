@@ -162,7 +162,7 @@ export class ProfilePage extends BaseElement {
                               : ""} w-full h-[150px] object-cover"
                       />`
                     : html`<div class="bg-blue-500 h-[150px]"></div>`}
-                <div class="absolute top-1 left-1 rounded-full bg-[#374151]/70 self-start">${closeButton()}</div>
+                <div class="absolute top-1 left-1 rounded-full bg-[#374151]/70 text-white self-start">${closeButton()}</div>
                 <div class="flex px-4 -mt-12 items-end">
                     ${profile.avatar
                         ? html`<img

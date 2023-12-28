@@ -27,23 +27,44 @@ export class App extends LitElement {
     }
 
     protected firstUpdated(_changedProperties: PropertyValueMap<any> | Map<PropertyKey, unknown>): void {
-        document.title = "Skychat";
-
         super.firstUpdated(_changedProperties);
-        router.addRoute("/", () => html`<login-page></login-page>`);
+        router.addRoute(
+            "/",
+            () => html`<login-page></login-page>`,
+            () => "Skychat"
+        );
         router.addRoute(
             "/404",
             () =>
                 html`<div class="${pageContainerStyle}">
                     <div class="${pageContentStyle}">${renderError(i18n("Whoops, that page doesn't exist"))}</div>
                 </div>`,
+            () => "Skychat - 404",
             false,
             false
         );
 
-        router.addRoute("/settings", () => html`<settings-page></settings-page>`, true, false);
-        router.addRoute("/home", () => html`<home-page></home-page>`, true, false);
-        router.addRoute<ProfilePage>("/profile/:id", () => html`<profile-page></profile-page>`, false, true);
+        router.addRoute(
+            "/settings",
+            () => html`<settings-page></settings-page>`,
+            () => "Skychat - " + i18n("Settings"),
+            true,
+            false
+        );
+        router.addRoute(
+            "/home",
+            () => html`<home-page></home-page>`,
+            () => "Skychat - " + i18n("Home"),
+            true,
+            false
+        );
+        router.addRoute<ProfilePage>(
+            "/profile/:id",
+            () => html`<profile-page></profile-page>`,
+            () => "Skychat - " + i18n("Profile"),
+            false,
+            true
+        );
 
         router.setRootRoute("/");
         router.setNotFoundRoot("/404");

@@ -7,7 +7,13 @@ export class Route<T extends HTMLElement> {
     readonly regexp: RegExp;
     readonly keys: Key[] = [];
 
-    constructor(readonly path: string, readonly renderPage: () => TemplateResult | T, readonly requiresAuth = false, readonly removePage = true) {
+    constructor(
+        readonly path: string,
+        readonly renderPage: () => TemplateResult | T,
+        readonly title: () => string,
+        readonly requiresAuth = false,
+        readonly removePage = true
+    ) {
         this.regexp = pathToRegexp(this.path, this.keys);
     }
 }
@@ -21,7 +27,7 @@ export class Router {
     rootRoute = "/";
     notFoundRoot = "/404";
     currPage = 0;
-    modal?: HTMLElement;
+    modals: HTMLElement[] = [];
     outlet = document.body;
     listeners: ((pathname: string) => void)[] = [];
 
@@ -44,8 +50,14 @@ export class Router {
         this.notFoundRoot = path;
     }
 
-    addRoute<T extends HTMLElement>(path: string, renderPage: () => TemplateResult | T, requiresAuth: boolean = false, removePage = true) {
-        const route = new Route(path, renderPage, requiresAuth, removePage);
+    addRoute<T extends HTMLElement>(
+        path: string,
+        renderPage: () => TemplateResult | T,
+        title: () => string,
+        requiresAuth: boolean = false,
+        removePage = true
+    ) {
+        const route = new Route(path, renderPage, title, requiresAuth, removePage);
         if (this.routes.some((other) => other.path == route.path)) throw new Error(`Route ${route.path}} already defined`);
         this.routes.push(route);
     }
@@ -80,7 +92,7 @@ export class Router {
     }
 
     pushModal(modal: HTMLElement) {
-        this.modal = modal;
+        this.modals.push(modal);
         this.currPage++;
         this.outlet.append(modal);
         history.pushState({ page: this.pageStack.length + 1 }, "", location.href);
@@ -156,14 +168,18 @@ export class Router {
 
     private navigateTo(path: string) {
         const route = this.matchRoute(path);
+
         if (!route) {
             this.navigateTo("/404");
             return false;
         }
+
         if (route.route.requiresAuth && !this.authProvider()) {
             this.navigateTo(this.rootRoute);
             return false;
         }
+
+        document.title = route?.route.title();
 
         if (this.top()) this.savePage(this.top()!);
         const matchingPage = this.pageStack.find((page) => page.path == path);
@@ -182,9 +198,9 @@ export class Router {
     disableNavigation = false;
     private handleNavigation(ev: PopStateEvent) {
         if (this.disableNavigation) return;
-        if (this.modal) {
-            this.modal.remove();
-            this.modal = undefined;
+        if (this.modals.length > 0) {
+            const modal = this.modals.pop()!;
+            modal.remove();
             this.currPage = ev.state.page;
             return;
         }

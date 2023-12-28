@@ -8,11 +8,11 @@ import { pageContainerStyle, pageContentStyle } from "../utils/styles.js";
 import { i18n } from "../utils/i18n.js";
 import { store } from "../appstate.js";
 import { settingsIcon } from "../utils/icons.js";
+import { router } from "../utils/routing.js";
 
 @customElement("home-page")
 export class HomePage extends BaseElement {
     render() {
-        document.title = "Skychat - Home";
         const user = store.get("user");
         if (!user)
             return html`<div class="${pageContainerStyle}">
@@ -29,6 +29,7 @@ export class HomePage extends BaseElement {
             <div class="${pageContentStyle}">
                 ${renderTopbar(i18n("Home"), undefined, homeButtons)}
                 <feed-view-post-stream
+                    class="-mt-2"
                     .stream=${new FeedViewPostStream(async (cursor?: string) => BlueSky.getHomeTimeline(cursor), true)}
                 ></feed-view-post-stream>
             </div>

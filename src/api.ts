@@ -19,6 +19,26 @@ export async function apiGet<T>(endpoint: string): Promise<T | Error> {
     }
 }
 
+export async function apiGetBlob(endpoint: string): Promise<Blob | Error> {
+    try {
+        const result = await fetch(apiBaseUrl() + endpoint);
+        if (!result.ok) throw new Error();
+        return await result.blob();
+    } catch (e) {
+        return error(`Request /api/${endpoint} failed`, e);
+    }
+}
+
+export async function apiGetText(endpoint: string): Promise<string | Error> {
+    try {
+        const result = await fetch(apiBaseUrl() + endpoint);
+        if (!result.ok) throw new Error();
+        return await result.text();
+    } catch (e) {
+        return error(`Request /api/${endpoint} failed`, e);
+    }
+}
+
 export async function apiPost<T>(endpoint: string, params: URLSearchParams | FormData): Promise<T | Error> {
     let headers: HeadersInit = {};
     let body: string | FormData;
@@ -73,5 +93,9 @@ export class Api {
 
     static async resolveDidWeb(did: string) {
         return apiGet<any>(`resolve-did-web?did=${encodeURIComponent(did)}`);
+    }
+
+    static async html(url: string) {
+        return apiGetText("html?url=" + encodeURIComponent(url));
     }
 }

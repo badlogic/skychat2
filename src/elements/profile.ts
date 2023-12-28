@@ -32,6 +32,14 @@ export class ProfileAvatarNameElement extends BaseElement {
                     </a>
                 `;
             case "small":
+                return html`
+                    <a class="flex items-center gap-2 hover:no-underline" href="/profile/${profile.did}">
+                        ${profile.avatar
+                            ? html`<img loading="lazy" class="w-4 h-4 fancy-shadow rounded-full" src="${profile.avatar}" />`
+                            : defaultAvatar}
+                        <span class="font-semibold line-clamp-1 hover:underline">${profile.displayName ?? profile.handle}</span>
+                    </a>
+                `;
             case "tiny":
                 return html`
                     <a class="flex items-center gap-2 hover:no-underline" href="/profile/${profile.did}">

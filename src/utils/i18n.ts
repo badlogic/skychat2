@@ -66,6 +66,8 @@ export interface Messages {
     "Nothing to show": string;
     "Replying to": string;
     "Deleted post": string;
+    "Content not available": string;
+    ALT: string;
 }
 
 const english: Messages = {
@@ -138,6 +140,8 @@ const english: Messages = {
     "Nothing to show": "Nothing to show",
     "Replying to": "Replying to",
     "Deleted post": "Deleted post",
+    "Content not available": "Content not available",
+    ALT: "ALT",
 };
 
 export type LanguageCode = "en";
