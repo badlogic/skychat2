@@ -2,7 +2,7 @@ import { PropertyValueMap, html } from "lit";
 import { customElement, property } from "lit/decorators.js";
 import PhotoSwipe from "photoswipe";
 import { router } from "../utils/routing.js";
-import { BaseElement, dom } from "../utils/ui-components.js";
+import { BaseElement, dom, isMobileBrowser } from "../utils/ui-components.js";
 
 // @ts-ignore
 import arrowLeftIconSvg from "remixicon/icons/Arrows/arrow-left-s-line.svg";
@@ -125,10 +125,14 @@ export class ImageGallery extends BaseElement {
             </div>`;
         }
 
+        let sx = 0,
+            sy = 0;
+        let clicked = false;
         const galleryDom = dom(
             html`<div
                 class="fixed top-0 left-0 w-full h-full backdrop-blur-[32px] z-50"
-                @click=${(ev: Event) => {
+                @click=${(ev: MouseEvent) => {
+                    if (!clicked) return;
                     let target: HTMLElement | null = ev.target as HTMLElement;
                     let isButton = false;
                     while (target && target != this) {
@@ -157,9 +161,20 @@ export class ImageGallery extends BaseElement {
             pswpModule: () => import("photoswipe"),
         });
         lightbox.init();
-        lightbox.on("close", () => router.pop());
+        lightbox.on("close", () => {
+            router.pop();
+        });
         lightbox.on("slideActivate", (event) => {
             console.log("Slide activated");
+        });
+        lightbox.on("pointerDown", (ev) => {
+            sx = ev.originalEvent.clientX;
+            sy = ev.originalEvent.clientY;
+        });
+        lightbox.on("pointerUp", (ev) => {
+            let dx = ev.originalEvent.clientX - sx;
+            let dy = ev.originalEvent.clientY - sy;
+            clicked = Math.sqrt(dx * dx + dy * dy) < 5;
         });
 
         const arrowEls = galleryDom.querySelectorAll(".pswp__button--arrow--prev, .pswp__button--arrow--next");
@@ -182,7 +197,7 @@ export class ImageGallery extends BaseElement {
                     <button class="bg-black text-white py-1 px-2 rounded w-10 h-10 flex items-center justify-center">
                         <i class="icon w-5 h-5">${downloadIcon}</i>
                     </button>
-                    <button class="bg-black text-white py-1 px-2 rounded w-10 h-10">${i18n("ALT")}</button>
+                    <button class="bg-black text-white py-1 px-2 rounded w-10 h-10 flex items-center justify-center">${i18n("ALT")}</button>
                 </div>
             `
         )[0];

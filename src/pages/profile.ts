@@ -244,12 +244,12 @@ export class ProfilePage extends BaseElement {
                             createdAt: "",
                         })}</div>`
                         : nothing}
-                    ${this.profile.viewer?.muted ? renderInfo(i18n("You are muting the user."), html`${shieldIcon}`) : nothing}
+                    ${this.profile.viewer?.muted ? renderInfo(i18n("You are muting the user"), html`${shieldIcon}`) : nothing}
                     ${this.profile.viewer?.mutedByList
                         ? renderInfo(i18n("User muted by moderation list ")(this.profile.viewer.mutedByList.name), html`${shieldIcon}`)
                         : nothing}
-                    ${this.profile.viewer?.blockedBy ? renderInfo(i18n("You are blocked by the user."), html`${shieldIcon}`) : nothing}
-                    ${this.profile.viewer?.blocking ? renderInfo(i18n("You are blocking the user."), html`${shieldIcon}`) : nothing}
+                    ${this.profile.viewer?.blockedBy ? renderInfo(i18n("You are blocked by the user"), html`${shieldIcon}`) : nothing}
+                    ${this.profile.viewer?.blocking ? renderInfo(i18n("You are blocking the user"), html`${shieldIcon}`) : nothing}
                     ${this.profile.viewer?.blockingByList
                         ? renderInfo(i18n("User blocked by moderation list ")(this.profile.viewer.blockingByList.name), html`${shieldIcon}`)
                         : nothing}

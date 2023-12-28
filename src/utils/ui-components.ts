@@ -139,7 +139,7 @@ export function copyTextToClipboard(text: string): void {
     try {
         const successful = document.execCommand("copy");
         if (!successful) {
-            console.error("Failed to copy link.");
+            console.error("Failed to copy link");
         }
     } catch (err) {
         console.error("Error in copying link: ", err);

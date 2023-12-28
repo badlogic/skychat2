@@ -21,12 +21,6 @@ export type PushPreferences = {
 
 export type DevPreferences = {
     enabled: boolean;
-    logPostViewRenders: boolean;
-    logFeedViewPostRenders: boolean;
-    logEmbedRenders: boolean;
-    logThreadViewPostRenders: boolean;
-    logStreamViewAppended: boolean;
-    logStreamViewPrepended: boolean;
 };
 
 export type Theme = "dark" | "light";

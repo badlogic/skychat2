@@ -14,6 +14,7 @@ import { store } from "./appstate.js";
 import { LoginPage } from "./pages/login.js";
 import { pageContainerStyle, pageContentStyle } from "./utils/styles.js";
 import { ProfilePage } from "./pages/profile.js";
+import { ThreadPage } from "./pages/thread.js";
 
 setupLiveReload();
 
@@ -57,6 +58,27 @@ export class App extends LitElement {
             () => "Skychat - " + i18n("Home"),
             true,
             false
+        );
+        router.addRoute<ThreadPage>(
+            "/thread/:did/:rkey",
+            () => html`<thread-page></thread-page>`,
+            () => "Skychat - " + i18n("Thread"),
+            false,
+            true
+        );
+        router.addRoute<ThreadPage>(
+            "/:did/app.bsky.feed.post/:rkey",
+            () => html`<thread-page></thread-page>`,
+            () => "Skychat - " + i18n("Thread"),
+            false,
+            true
+        );
+        router.addRoute<ThreadPage>(
+            "/profile/:did/post/:rkey",
+            () => html`<thread-page></thread-page>`,
+            () => "Skychat - " + i18n("Thread"),
+            false,
+            true
         );
         router.addRoute<ProfilePage>(
             "/profile/:id",

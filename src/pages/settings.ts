@@ -167,64 +167,6 @@ export class SettingsPage extends BaseElement {
                         this.requestUpdate();
                     }}
                 ></slide-button>
-                ${devPrefs.enabled
-                    ? html`
-                          <slide-button
-                              class="px-4 mt-4"
-                              .checked=${devPrefs.logEmbedRenders}
-                              .text=${"Log embed renders"}
-                              @changed=${(ev: CustomEvent) => {
-                                  devPrefs.logEmbedRenders = ev.detail.value;
-                                  store.set("devPrefs", devPrefs);
-                              }}
-                          ></slide-button>
-                          <slide-button
-                              class="px-4 mt-4"
-                              .checked=${devPrefs.logPostViewRenders}
-                              .text=${"Log PostView renders"}
-                              @changed=${(ev: CustomEvent) => {
-                                  devPrefs.logPostViewRenders = ev.detail.value;
-                                  store.set("devPrefs", devPrefs);
-                              }}
-                          ></slide-button>
-                          <slide-button
-                              class="px-4 mt-4"
-                              .checked=${devPrefs.logFeedViewPostRenders}
-                              .text=${"Log FeedViewPost renders"}
-                              @changed=${(ev: CustomEvent) => {
-                                  devPrefs.logFeedViewPostRenders = ev.detail.value;
-                                  store.set("devPrefs", devPrefs);
-                              }}
-                          ></slide-button>
-                          <slide-button
-                              class="px-4 mt-4"
-                              .checked=${devPrefs.logThreadViewPostRenders}
-                              .text=${"Log ThreadViewPost renders"}
-                              @changed=${(ev: CustomEvent) => {
-                                  devPrefs.logThreadViewPostRenders = ev.detail.value;
-                                  store.set("devPrefs", devPrefs);
-                              }}
-                          ></slide-button>
-                          <slide-button
-                              class="px-4 mt-4"
-                              .checked=${devPrefs.logStreamViewAppended}
-                              .text=${"Log StreamView appends"}
-                              @changed=${(ev: CustomEvent) => {
-                                  devPrefs.logStreamViewAppended = ev.detail.value;
-                                  store.set("devPrefs", devPrefs);
-                              }}
-                          ></slide-button>
-                          <slide-button
-                              class="px-4 mt-4"
-                              .checked=${devPrefs.logStreamViewPrepended}
-                              .text=${"Log StreamView prepend"}
-                              @changed=${(ev: CustomEvent) => {
-                                  devPrefs.logStreamViewPrepended = ev.detail.value;
-                                  store.set("devPrefs", devPrefs);
-                              }}
-                          ></slide-button>
-                      `
-                    : nothing}
             </div>
         </div>`;
     }

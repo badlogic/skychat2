@@ -130,7 +130,7 @@ export class Firehose {
                             break;
                     }
                 } catch (e) {
-                    console.error("Error processing message op.", e);
+                    console.error("Error processing message op", e);
                 }
             });
         }

@@ -53,10 +53,10 @@ export interface Messages {
     followers: string;
     following: string;
     posts: string;
-    "You are muting the user.": string;
+    "You are muting the user": string;
     "User muted by moderation list ": (list: string) => string;
-    "You are blocked by the user.": string;
-    "You are blocking the user.": string;
+    "You are blocked by the user": string;
+    "You are blocking the user": string;
     "User blocked by moderation list ": (list: string) => string;
     Posts: string;
     "Posts & Replies": string;
@@ -68,6 +68,13 @@ export interface Messages {
     "Deleted post": string;
     "Content not available": string;
     ALT: string;
+    "Not connected": string;
+    "Post does not exist": string;
+    "Post author has blocked you": string;
+    "Click to view": string;
+    "You have blocked the post author": string;
+    "You have blocked the author or the author has blocked you": string;
+    "Show replies": string;
 }
 
 const english: Messages = {
@@ -127,10 +134,10 @@ const english: Messages = {
     followers: "followers",
     following: "following",
     posts: "posts",
-    "You are muting the user.": "You are muting the user.",
+    "You are muting the user": "You are muting the user",
     "User muted by moderation list ": (list: string) => "User muted by moderation list " + list,
-    "You are blocked by the user.": "You are blocked by the user.",
-    "You are blocking the user.": "You are blocking the user.",
+    "You are blocked by the user": "You are blocked by the user",
+    "You are blocking the user": "You are blocking the user",
     "User blocked by moderation list ": (list: string) => "User blocked by moderation list " + list,
     Posts: "Posts",
     "Posts & Replies": "Posts & Replies",
@@ -142,6 +149,13 @@ const english: Messages = {
     "Deleted post": "Deleted post",
     "Content not available": "Content not available",
     ALT: "ALT",
+    "Not connected": "Not connected",
+    "Post does not exist": "Post does not exist",
+    "Post author has blocked you": "Post author has blocked you",
+    "Click to view": "Click to view",
+    "You have blocked the post author": "You have blocked the post author",
+    "You have blocked the author or the author has blocked you": "You have blocked the author or the author has blocked you",
+    "Show replies": "Show replies",
 };
 
 export type LanguageCode = "en";

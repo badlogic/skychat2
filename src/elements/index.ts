@@ -6,3 +6,4 @@ export * from "./record.js";
 export * from "./time.js";
 export * from "./embeds.js";
 export * from "./image-gallery.js";
+export * from "./icon-toggle.js";

@@ -86,7 +86,13 @@ export class ImagesEmbed extends BaseElement {
             router.pushModal(gallery);
         };
 
-        const renderImage = (image: ViewImage, index: number) => html`<div class="w-full h-full" @click=${() => renderGallery(index)}>
+        const renderImage = (image: ViewImage, index: number) => html`<div
+            class="w-full h-full"
+            @click=${(ev: Event) => {
+                ev.stopPropagation();
+                renderGallery(index);
+            }}
+        >
             <img
                 src="${image.thumb}"
                 alt="${image.alt}"
@@ -99,7 +105,10 @@ export class ImagesEmbed extends BaseElement {
             return html`<div class="w-full flex justify-center">
                 <div class="relative">
                     <img
-                        @click=${() => renderGallery(0)}
+                        @click=${(ev: Event) => {
+                            ev.stopPropagation();
+                            renderGallery(0);
+                        }}
                         src="${images[0].thumb}"
                         alt="${images[0].alt}"
                         class="cursor-pointer w-auto max-h-[80vh] rounded ${sensitive ? "blur-lg" : ""}"
@@ -159,7 +168,7 @@ export class RecordEmbed extends BaseElement {
         }
 
         if (AppBskyEmbedRecord.isViewBlocked(record)) {
-            return renderInfo(i18n("You are blocked by the user."), html`${shieldIcon}`);
+            return renderInfo(i18n("You are blocked by the user"), html`${shieldIcon}`);
         }
 
         // FIXME generator & list view

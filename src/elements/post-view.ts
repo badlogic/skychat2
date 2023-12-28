@@ -1,14 +1,15 @@
 import { PostView } from "@atproto/api/dist/client/types/app/bsky/feed/defs.js";
-import { PropertyValueMap, TemplateResult, html, nothing } from "lit";
+import { TemplateResult, html, nothing } from "lit";
 import { customElement, property } from "lit/decorators.js";
-import { BlueSky, record, text } from "../apis/bluesky.js";
-import { BaseElement, SubscribedElement, renderInfo } from "../app.js";
-import { StreamView } from "../utils/streamviews.js";
-import { heartFilledIcon, heartIcon, quoteIcon, reblogIcon, replyIcon } from "../utils/icons.js";
-import { state } from "../appstate.js";
-import { clone, error } from "../utils/utils.js";
+import { BlueSky, record } from "../apis/bluesky.js";
+import { BaseElement, SubscribedElement, ThreadPage, copyTextToClipboard, renderInfo, toast } from "../app.js";
+import { state, store } from "../appstate.js";
+import { splitAtUri } from "../common.js";
 import { i18n } from "../utils/i18n.js";
-import { AppBskyEmbedExternal, AppBskyEmbedImages, AppBskyEmbedRecord, AppBskyEmbedRecordWithMedia } from "@atproto/api";
+import { heartFilledIcon, heartIcon, quoteIcon, reblogIcon, replyIcon } from "../utils/icons.js";
+import { StreamView } from "../utils/streamviews.js";
+import { clone, error } from "../utils/utils.js";
+import { router } from "../utils/routing.js";
 
 @customElement("post-view-buttons")
 export class PostViewButtons extends BaseElement {
@@ -24,16 +25,44 @@ export class PostViewButtons extends BaseElement {
         const iconStyle = "icon w-4 h-4";
 
         return html`<div class="flex items-center h-10 gap-4">
-            <button @click=${() => this.reply()} class="${buttonStyle}"><i class="${iconStyle}">${replyIcon}</i><span>${this.post.replyCount ?? 0}</a>
+            <button @click=${() => this.reply()} class="${buttonStyle}"><i class="${iconStyle}">${replyIcon}</i><span>${
+            this.post.replyCount ?? 0
+        }</button>
             <button @click=${() => this.quote()} class="${buttonStyle}"><i class="${iconStyle}">${quoteIcon}</i><span>${
             numQuotes?.numQuotes.toString() ?? 0
-        }</a>
+        }</button>
             <button @click=${() => this.repost()} class="${
             buttonStyle + " " + (this.post.viewer?.repost ? highlightStyle : "")
         }"><i class="${iconStyle}">${reblogIcon}</i><span>${this.post.repostCount ?? 0}</button>
             <button @click=${() => this.like()} class="${
             buttonStyle + " " + (this.post.viewer?.like ? highlightStyle : "")
         }"><i class="${iconStyle}">${this.post.viewer?.like ? heartFilledIcon : heartIcon}</i><span>${this.post.likeCount ?? 0}</button>
+        ${
+            store.get("devPrefs")?.enabled
+                ? html`<button
+                      class="text-primary"
+                      @click=${() => {
+                          copyTextToClipboard(this.post?.uri ?? "");
+                          toast("Copied URI to clipboard");
+                      }}
+                  >
+                      URI
+                  </button>`
+                : nothing
+        }
+        ${
+            store.get("devPrefs")?.enabled
+                ? html`<button
+                      class="text-primary"
+                      @click=${() => {
+                          copyTextToClipboard(JSON.stringify(this.post, null, 2));
+                          toast("Copied JSON to clipboard");
+                      }}
+                  >
+                      JSON
+                  </button>`
+                : nothing
+        }
         </div>`;
     }
 
@@ -116,6 +145,9 @@ export class PostViewElement extends SubscribedElement {
     @property()
     showReplyingTo = true;
 
+    @property()
+    smallHeader = false;
+
     connectedCallback(): void {
         super.connectedCallback();
         if (this.post) {
@@ -136,14 +168,24 @@ export class PostViewElement extends SubscribedElement {
 
         const rec = record(this.post);
         const embed = this.post.embed;
+        const { repo, rkey } = splitAtUri(this.post.uri);
 
-        return html`<div class="flex flex-col">
-            <div class="flex items-center">
-                <profile-avatar-name .profile=${this.post.author}></profile-avatar-name>
-                <time-view
-                    class="ml-auto text-xs text-muted-fg self-start"
-                    .timeUTC=${new Date(rec?.createdAt ?? new Date().toISOString()).getTime()}
-                ></time-view>
+        return html`<div
+            class="flex flex-col cursor-pointer"
+            @click=${(ev: Event) => {
+                // FIXME ugh hax, in thread view, this will overwrite collapse/expand replies
+                if (router.top()?.page instanceof ThreadPage) return;
+                ev.preventDefault();
+                ev.stopPropagation();
+                router.push("/thread/" + repo + "/" + rkey);
+            }}
+        >
+            <div class="flex items-center gap-1">
+                <profile-avatar-name .profile=${this.post.author} .size=${this.smallHeader ? "small" : "normal"}></profile-avatar-name>
+                ${this.smallHeader ? html`<span>·</span>` : nothing}
+                <a href="/thread/${this.post.author.did}/${splitAtUri(this.post.uri).rkey}" class="${this.smallHeader ? "" : "ml-auto self-start"}"
+                    ><time-view class="text-xs text-muted-fg" .timeUTC=${new Date(rec?.createdAt ?? new Date().toISOString()).getTime()}></time-view
+                ></a>
             </div>
             <record-view class="mt-1" .record=${rec} .showReplyingTo=${this.showReplyingTo}></record-view>
             ${embed ? html`<embed-view class="mt-1" .embed=${embed}></embed-view>` : nothing}

@@ -53,11 +53,11 @@ export async function processPushNotification(payload: any, showNotification: (t
         const notification = payload.data as PushNotification;
         const { bskyClient, user, pushPrefs } = await getBskyClientAndUser();
         if (!user || user.profile.did != payload.data.toDid) {
-            console.error("Received notification for other user, or not logged in.");
+            console.error("Received notification for other user, or not logged in");
             return;
         }
         if (!pushPrefs) {
-            console.error("No push preferences found.");
+            console.error("No push preferences found");
             return;
         }
 

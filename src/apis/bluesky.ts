@@ -177,7 +177,7 @@ export class BlueSky {
         } catch (e) {
             store.set("user", undefined);
             BlueSky.client = undefined;
-            return error("Couldn't log-in with your BlueSky credentials.", e);
+            return error("Couldn't log-in with your BlueSky credentials", e);
         }
     }
 
@@ -432,6 +432,18 @@ export class BlueSky {
             return { cursor: result.data.cursor, items: result.data.feed };
         } catch (e) {
             return error("Couldn't load logged in actor likes", e);
+        }
+    }
+
+    static async getDidForHandle(handle: string): Promise<string | Error> {
+        if (!BlueSky.client) return new Error("Not connected");
+        try {
+            if (handle.startsWith("did:")) return handle;
+            let did = await BlueSky.client.resolveHandle({ handle });
+            if (!did.success) throw new Error("Couldn't get did");
+            return did.data.did;
+        } catch (e) {
+            return error("Couldn't get did for handle " + handle, e);
         }
     }
 
