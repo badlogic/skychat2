@@ -61,7 +61,6 @@ export class BottomNavBar extends BaseElement {
 
         return html`<div class="${baseStyle} ${mobileStyle} ${desktopStyle}">
             <div class="flex justify-between md:flex-col md:justify-start md:align-center md:gap-2">
-                <up-button class="absolute"></up-button>
                 <a href="/home" class="text-black dark:text-white flex items-center justify-center w-12 h-12">
                     <i class="icon w-6 h-6">${homeIcon}</i>
                 </a>

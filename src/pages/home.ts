@@ -2,7 +2,7 @@ import { FeedViewPost } from "@atproto/api/dist/client/types/app/bsky/feed/defs.
 import { TemplateResult, html } from "lit";
 import { customElement } from "lit/decorators.js";
 import { BlueSky, FeedViewPostStream } from "../apis/bluesky.js";
-import { BaseElement, FeedViewPostStreamView, renderError, renderTopbar } from "../app.js";
+import { BaseElement, FeedViewPostStreamView, UpButton, getScrollParent, renderError, renderTopbar } from "../app.js";
 import { StreamView } from "../utils/streamviews.js";
 import { pageContainerStyle, pageContentStyle } from "../utils/styles.js";
 import { i18n } from "../utils/i18n.js";
@@ -31,8 +31,10 @@ export class HomePage extends BaseElement {
                 <feed-view-post-stream
                     class="-mt-2"
                     .stream=${new FeedViewPostStream(async (cursor?: string) => BlueSky.getHomeTimeline(cursor), true)}
+                    .newItems=${() => (this.querySelector("up-button")! as UpButton).setHighlight()}
                 ></feed-view-post-stream>
             </div>
+            <up-button></up-button>
         </div>`;
     }
 }

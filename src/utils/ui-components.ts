@@ -231,7 +231,7 @@ export abstract class FloatingButton extends LitElement {
     highlight = false;
 
     @property()
-    highlightAnimation = "animate-pulse";
+    highlightAnimation = "";
 
     @property()
     highlightStyle = "w-12 h-12 flex justify-center items-center bg-primary rounded-full fancy-shadow";
@@ -240,7 +240,7 @@ export abstract class FloatingButton extends LitElement {
     highlightIconStyle = "text-[#fff]";
 
     @property()
-    hide = false;
+    lower = false;
 
     @property()
     value?: string;
@@ -262,12 +262,9 @@ export abstract class FloatingButton extends LitElement {
     render() {
         const normalStyle =
             "w-12 h-12 flex justify-center items-center bg-background dark:bg-divider border border-divider rounded-full fancy-shadow";
+        const animationStyle = `transition-transform  ${this.lower ? "translate-y-full md:translate-y-0" : "translate-y-0"}`;
 
-        return html`<div
-            class="fixed z-10 ${this.getOffset()} ${this.hide && !this.highlight
-                ? "animate-fade animate-reverse disable-pointer-events"
-                : "animate-fade enable-pointer-events"} animate-duration-300"
-        >
+        return html`<div class="${animationStyle} fixed z-20 ${this.getOffset()} animate-duration-300 md:right-[calc(50vw+336px)]">
             <button
                 class="${this.highlight ? this.highlightStyle + " animate-infinite animate-ease-in-out " : normalStyle}"
                 @click=${() => this.handleClick()}
@@ -305,7 +302,7 @@ export class UpButton extends FloatingButton {
 
     constructor() {
         super();
-        this.hide = true;
+        this.classList.add("hidden");
     }
 
     connectedCallback(): void {
@@ -341,26 +338,45 @@ export class UpButton extends FloatingButton {
     scrollHandler = () => this.handleScroll();
     handleScroll() {
         if (this.highlight) {
-            if (getScrollParent(this.parentElement)!.scrollTop < 80) {
-                this.hide = true;
+            if (getScrollParent(this.parentElement)!.scrollTop < 10) {
                 this.highlight = false;
+                this.classList.add("hidden");
             }
+            const dir = this.lastScrollTop - getScrollParent(this.parentElement)!.scrollTop;
+            if (dir != 0) {
+                this.lower = dir < 0;
+            }
+            this.classList.remove("hidden");
             this.lastScrollTop = getScrollParent(this.parentElement)!!.scrollTop;
             return;
         }
 
         if (getScrollParent(this.parentElement)!.scrollTop < 10) {
-            this.hide = true;
             this.highlight = false;
             this.lastScrollTop = getScrollParent(this.parentElement)!.scrollTop;
+            this.classList.add("hidden");
             return;
         }
+        this.classList.remove("hidden");
 
         const dir = this.lastScrollTop - getScrollParent(this.parentElement)!.scrollTop;
         if (dir != 0) {
-            this.hide = dir < 0;
+            if (dir < 0) {
+                this.classList.add("hidden");
+            } else {
+                this.classList.remove("hidden");
+            }
+            this.lower = dir < 0;
         }
         this.lastScrollTop = getScrollParent(this.parentElement)!.scrollTop;
+    }
+
+    setHighlight() {
+        const scrollParent = getScrollParent(this)!;
+        if (scrollParent.scrollTop > 80) {
+            this.classList.remove("hidden");
+            this.highlight = true;
+        }
     }
 }
 

@@ -154,15 +154,17 @@ export class Router {
         page.display = page.page.style.display;
         const streamViews = Array.from(page.page.querySelectorAll("*")).filter((el) => el instanceof StreamView) as StreamView<any>[];
         for (const streamView of streamViews) streamView.disableIntersector = true;
-        page.page.style.display = "none";
+        // page.page.style.display = "none";
+        page.page.remove();
     }
 
     private restorePage(page: RouterPage) {
         this.pageStack = this.pageStack.filter((other) => other != page);
         this.pageStack.push(page);
+        this.outlet.append(page.page);
         const streamViews = Array.from(page.page.querySelectorAll("*")).filter((el) => el instanceof StreamView) as StreamView<any>[];
         for (const streamView of streamViews) streamView.disableIntersector = false;
-        page.page.style.display = page.display;
+        // page.page.style.display = page.display;
         queueMicrotask(() => (getScrollParent(this.outlet)!.scrollTop = page.srcollTop));
     }
 
@@ -227,6 +229,7 @@ export class Router {
                 if (page.route.removePage) {
                     page.page.remove();
                 } else {
+                    page.page.remove();
                     this.pageStack.push(page);
                 }
             }

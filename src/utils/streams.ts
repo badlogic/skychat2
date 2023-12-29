@@ -13,8 +13,9 @@ export abstract class Stream<T> {
     constructor(readonly provider: StreamProvider<T>, public readonly pollNew = false, readonly pollInterval = 5000) {}
 
     isPolling = false;
+    pollingPaused = false;
     async poll() {
-        if (this.isPolling) return;
+        if (this.isPolling || this.pollingPaused) return;
         this.isPolling = true;
 
         try {
@@ -101,6 +102,15 @@ export abstract class Stream<T> {
         } catch (e) {
             return error("Could not load items", e);
         }
+    }
+
+    pause() {
+        this.pollingPaused = true;
+    }
+
+    resume() {
+        this.pollingPaused = false;
+        this.poll();
     }
 
     close(): void {

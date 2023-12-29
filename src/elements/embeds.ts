@@ -16,6 +16,7 @@ import { deleteIcon, shieldIcon } from "../utils/icons.js";
 import { router } from "../utils/routing.js";
 import { GalleryImage } from "./image-gallery.js";
 import { tryEmbedMedia } from "./external-media.js";
+import { splitAtUri } from "../common.js";
 
 @customElement("embed-external")
 export class ExternalEmbed extends BaseElement {
@@ -176,13 +177,24 @@ export class RecordEmbed extends BaseElement {
         if (AppBskyEmbedRecord.isViewRecord(record) && AppBskyFeedPost.isRecord(record.value)) {
             const post = record.value;
 
-            return html`<div class="p-2 border border-divider rounded-md flex flex-col">
+            const atUri = splitAtUri(record.uri);
+
+            return html`<div
+                class="p-2 border border-divider rounded-md flex flex-col"
+                @click=${(ev: Event) => {
+                    if (window.getSelection() && window.getSelection()?.toString().length != 0) return;
+                    ev.stopPropagation();
+                    router.push("/thread/" + atUri.repo + "/" + atUri.rkey);
+                }}
+            >
                 <div class="flex">
                     <profile-avatar-name .profile=${record.author}></profile-avatar-name>
-                    <time-view
-                        class="ml-auto text-xs text-muted-fg self-start"
-                        .timeUTC=${new Date(post.createdAt ?? new Date().toISOString()).getTime()}
-                    ></time-view>
+                    <a href="/thread/${atUri.repo}/${atUri.rkey}" class="ml-auto self-start">
+                        <time-view
+                            class="text-xs text-muted-fg"
+                            .timeUTC=${new Date(post.createdAt ?? new Date().toISOString()).getTime()}
+                        ></time-view>
+                    </a>
                 </div>
                 <record-view .record=${post}></record-view>
                 ${map(record.embeds, (embed) => html`<embed-view class="mt-1" .embed=${embed}></embed-view>`)}
@@ -237,7 +249,7 @@ export class EmbedElement extends BaseElement {
         const recordWithMediaEmbed = AppBskyEmbedRecordWithMedia.isView(embed) ? embed : undefined;
         const externalEmbed = AppBskyEmbedExternal.isView(embed) || AppBskyEmbedExternal.isMain(embed) ? embed : undefined;
 
-        return html`<div class="flex flex-col gap-1">
+        return html`<div class="flex flex-col gap-1" @click=${(ev: Event) => ev.stopPropagation()}>
             ${imagesEmbed ? html`<embed-images .images=${imagesEmbed} .small=${this.small} .sensitive=${this.sensitive}></embed-images>` : nothing}
             ${externalEmbed
                 ? html`<embed-external .external=${externalEmbed} .small=${this.small} .sensitive=${this.sensitive}></embed-external>`

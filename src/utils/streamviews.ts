@@ -36,6 +36,7 @@ export abstract class StreamView<T> extends LitElement {
         return this;
     }
 
+    wasFirstUpdated = false;
     protected firstUpdated(_changedProperties: PropertyValueMap<any> | Map<PropertyKey, unknown>): void {
         super.firstUpdated(_changedProperties);
         if (!this.stream) {
@@ -46,11 +47,21 @@ export abstract class StreamView<T> extends LitElement {
         this.intersectionObserver = new IntersectionObserver((entries, observer) => this.handleIntersection(entries, observer));
         this.poll();
         this.load();
+        this.wasFirstUpdated = true;
+    }
+
+    connectedCallback(): void {
+        super.connectedCallback();
+        if (this.wasFirstUpdated) this.stream?.resume();
+        for (const page of this.renderedPages) {
+            this.intersectionObserver?.observe(page.container);
+            if (page.placeholder) this.intersectionObserver?.observe(page.placeholder);
+        }
     }
 
     disconnectedCallback(): void {
         super.disconnectedCallback();
-        this.stream?.close();
+        this.stream?.pause();
         for (const page of this.renderedPages) {
             this.intersectionObserver?.unobserve(page.container);
             if (page.placeholder) this.intersectionObserver?.unobserve(page.placeholder);

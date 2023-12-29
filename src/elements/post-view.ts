@@ -2,7 +2,7 @@ import { PostView } from "@atproto/api/dist/client/types/app/bsky/feed/defs.js";
 import { TemplateResult, html, nothing } from "lit";
 import { customElement, property } from "lit/decorators.js";
 import { BlueSky, record } from "../apis/bluesky.js";
-import { BaseElement, SubscribedElement, ThreadPage, copyTextToClipboard, renderInfo, toast } from "../app.js";
+import { BaseElement, SubscribedElement, ThreadPage, copyTextToClipboard, hasLinkOrButtonParent, renderInfo, toast } from "../app.js";
 import { state, store } from "../appstate.js";
 import { splitAtUri } from "../common.js";
 import { i18n } from "../utils/i18n.js";
@@ -24,7 +24,7 @@ export class PostViewButtons extends BaseElement {
         const highlightStyle = "animate-jump text-primary";
         const iconStyle = "icon w-4 h-4";
 
-        return html`<div class="flex items-center h-10 gap-4">
+        return html`<div class="flex items-center h-10 gap-4" @click=${(ev: Event) => ev.stopPropagation()}>
             <button @click=${() => this.reply()} class="${buttonStyle}"><i class="${iconStyle}">${replyIcon}</i><span>${
             this.post.replyCount ?? 0
         }</button>
@@ -148,6 +148,9 @@ export class PostViewElement extends SubscribedElement {
     @property()
     smallHeader = false;
 
+    @property()
+    openThreadOnClick = true;
+
     connectedCallback(): void {
         super.connectedCallback();
         if (this.post) {
@@ -173,9 +176,8 @@ export class PostViewElement extends SubscribedElement {
         return html`<div
             class="flex flex-col cursor-pointer"
             @click=${(ev: Event) => {
-                // FIXME ugh hax, in thread view, this will overwrite collapse/expand replies
-                if (router.top()?.page instanceof ThreadPage) return;
-                ev.preventDefault();
+                if (!this.openThreadOnClick) return;
+                if (window.getSelection() && window.getSelection()?.toString().length != 0) return;
                 ev.stopPropagation();
                 router.push("/thread/" + repo + "/" + rkey);
             }}

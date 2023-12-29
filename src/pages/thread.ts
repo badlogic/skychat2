@@ -394,11 +394,12 @@ export class ThreadViewPostElement extends BaseElement {
 
         const highlight = thread.post.uri == this.highlightUri;
 
-        const postDom = dom(html`<div data-uri="${thread.post.uri}" class="${highlight ? animation : ""} min-w-[350px] pr-2 flex flex-col">
+        const postDom = dom(html`<div data-uri="${thread.post.uri}" class="min-w-[350px] pr-2 flex flex-col">
             <post-view
-                class="${!this.isRoot || (highlight && this.isRoot) ? "pl-2" : ""} ${highlight ? "border-l border-primary" : ""}"
+                class="${!this.isRoot || (highlight && this.isRoot) ? "pl-2" : ""} ${highlight ? animation + " border-l border-primary" : ""}"
                 .post=${this.thread.post}
                 .smallHeader=${true}
+                .openThreadOnclick=${false}
                 @click=${(ev: MouseEvent) => toggleReplies(ev)}
             ></post-view>
             <div
