@@ -450,11 +450,11 @@ export class ButtonGroup<T> extends LitElement {
     }
 
     render() {
-        return html`<div class="flex h-8 fancy-shadow rounded-lg cursor-pointer">
+        return html`<div class="flex h-8 fancy-shadow rounded-full cursor-pointer">
             ${map(this.values, (value, index) => {
                 let rounded = "";
-                if (index == 0) rounded = "rounded-l-lg";
-                if (index == this.values.length - 1) rounded = "rounded-r-lg";
+                if (index == 0) rounded = "rounded-l-full";
+                if (index == this.values.length - 1) rounded = "rounded-r-full";
                 let selected =
                     this.values[index].value == this.selected
                         ? "bg-primary text-primary-fg hover:bg-primarysw-600"

@@ -188,7 +188,7 @@ export class RecordEmbed extends BaseElement {
                 }}
             >
                 <div class="flex">
-                    <profile-avatar-name .profile=${record.author}></profile-avatar-name>
+                    <profile-avatar-name .profile=${record.author} .size=${"small"}></profile-avatar-name>
                     <a href="/thread/${atUri.repo}/${atUri.rkey}" class="ml-auto self-start">
                         <time-view
                             class="text-xs text-muted-fg"
@@ -196,7 +196,7 @@ export class RecordEmbed extends BaseElement {
                         ></time-view>
                     </a>
                 </div>
-                <record-view .record=${post}></record-view>
+                <record-view .record=${post} class="mt-1"></record-view>
                 ${map(record.embeds, (embed) => html`<embed-view class="mt-1" .embed=${embed}></embed-view>`)}
             </div>`;
         }

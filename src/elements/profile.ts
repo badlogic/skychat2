@@ -24,7 +24,7 @@ export class ProfileAvatarNameElement extends BaseElement {
                     <a class="flex items-center gap-2 hover:no-underline" href="/profile/${profile.did}">
                         ${profile.avatar
                             ? html`<img loading="lazy" class="w-8 h-8 fancy-shadow rounded-full" src="${profile.avatar}" />`
-                            : defaultAvatar}
+                            : html`<i class="icon w-8 h-8">${defaultAvatar}</i>`}
                         <div class="flex flex-col">
                             <span class="font-semibold line-clamp-1 hover:underline">${profile.displayName ?? profile.handle}</span>
                             ${profile.displayName ? html`<span class="text-xs text-muted-fg hover:underline">${profile.handle}</span>` : nothing}
@@ -35,8 +35,8 @@ export class ProfileAvatarNameElement extends BaseElement {
                 return html`
                     <a class="flex items-center gap-2 hover:no-underline" href="/profile/${profile.did}">
                         ${profile.avatar
-                            ? html`<img loading="lazy" class="w-4 h-4 fancy-shadow rounded-full" src="${profile.avatar}" />`
-                            : defaultAvatar}
+                            ? html`<img loading="lazy" class="w-6 h-6 fancy-shadow rounded-full" src="${profile.avatar}" />`
+                            : html`<i class="icon w-6 h-6">${defaultAvatar}</i>`}
                         <span class="font-semibold line-clamp-1 hover:underline">${profile.displayName ?? profile.handle}</span>
                     </a>
                 `;
@@ -45,7 +45,7 @@ export class ProfileAvatarNameElement extends BaseElement {
                     <a class="flex items-center gap-2 hover:no-underline" href="/profile/${profile.did}">
                         ${profile.avatar
                             ? html`<img loading="lazy" class="w-4 h-4 fancy-shadow rounded-full" src="${profile.avatar}" />`
-                            : defaultAvatar}
+                            : html`<i class="icon w-4 h-4">${defaultAvatar}</i>`}
                         <span class="text-xs text-muted-fg line-clamp-1 hover:underline">${profile.displayName ?? profile.handle}</span>
                     </a>
                 `;
